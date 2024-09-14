@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+    	<title>Message Hider</title>
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+        <link rel="manifest" href="/site.webmanifest">
+        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    	<script src="script.js"></script>
+        <link rel="stylesheet" href="style.css">
+    <head>
+    <body onload="runonload()">
+        <div class="main">
+            <div class="control-panel">
+                <p class="sm_text bt">Darko s site</p>
+                <div class="btns">
+                    <button type="button" id="mh" onclick="vist_page()">Message Hider</button>
+                    <button type="button" id="ss" onclick="vist_page()">SubSite</button>
+                </div>
+            </div>
+            <div class="main">
+                <div class="mp">
+                    <label class="info_text newline" for="all_charcodess">My Main Page</label>
+                    <textarea disabled id="pginfo" name="pginfo" rows="6" cols="150">Here you can select what page&#13;&#10;&#13;&#10;You Want to Visit</textarea>
+                </div>
+            </div>
+        </div>
+        <!-- The Modal/popup info box -->
+        <div id="infobox" class="infob">
+            <div class="infob-content">
+                <p id="popup_text"></p>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,214 @@
+:root {
+    --btn-glow_one: rgba(44,187,99,.35);
+    --btn-glow_two: rgba(44,187,99,.25);
+    --main-color: #0ca21d;
+    --med-color: #0ebe20;
+    --text-color : #aafbb5;
+    --disabled-main: #6ca271;
+    --bg-color: #2b2d2b;
+    --secondary-color: #131413;
+    --third-color: #171817;
+    --selected-color: #000;
+    --disabled-color: #442323;
+}
+
+
+
+/*
+-------
+Main colorings
+-------
+*/
+* {
+    font-family: courier;
+    font-weight: 300;
+}
+
+body {
+    background-size: 500% 500%;
+    background-image: linear-gradient(-45deg, var(--bg-color), var(--selected-color), var(--bg-color) 100%);
+    -webkit-animation: AnimateBG 20s ease infinite;
+    animation: AnimateBG 20s ease infinite;
+}
+
+@-webkit-keyframes AnimateBG {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes AnimateBG {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+label {
+    color: var(--main-color);
+    background-color: var(--secondary-color)
+}
+
+p {
+    color: var(--text-color);
+}
+
+input, textarea {
+    vertical-align: middle;
+    margin: 5px 10px 5px 0;
+    padding: 10px;
+    background-color: var(--third-color);
+    border: 1px solid var(--selected-color);
+    color: var(--text-color);
+}
+
+button {
+    padding: 10px 20px;
+    background-color: var(--main-color);
+    border: 1px solid var(--bg-color);
+    color: var(---selected-color);
+    cursor: pointer;
+    font-weight: 1000;
+    font-size: 15px;
+    -webkit-transition: border-radius 0.5s, background-color 200ms linear, transform 0.2s linear;
+    -ms-transition: border-radius 0.5s, background-color 200ms linear, transform 0.2s linear;
+    transition: border-radius 0.5s, background-color 200ms linear, transform 0.2s linear;
+}
+
+button:hover:enabled {
+    -webkit-transition: border-radius 0.5s, background-color 200ms linear, transform 0.2s linear;
+    -ms-transition: border-radius 0.5s, background-color 200ms linear, transform 0.2s linear;
+    transition: border-radius 0.5s, background-color 200ms linear, transform 0.2s linear;
+    background-color: var(--med-color);
+    border-radius: 10px;
+    border: 1px solid var(--text-color);
+    transform: scale(1.05) rotate(-1deg);
+    box-shadow: var(--btn-glow_one) 0 -25px 18px -14px inset,var(--btn-glow_two) 0 1px 2px,var(--btn-glow_two) 0 2px 4px,var(--btn-glow_two) 0 4px 8px,var(--btn-glow_two) 0 8px 16px,var(--btn-glow_two) 0 16px 32px;
+}
+
+button:active:enabled {
+    -webkit-transition: border-radius 0.5s, background-color 200ms linear, transform 0.2s linear;
+    -ms-transition: border-radius 0.5s, background-color 200ms linear, transform 0.2s linear;
+    transition: border-radius 0.5s, background-color 200ms linear, transform 0.2s linear;
+    background-color: var(--text-color);
+}
+
+button.selected:enabled {
+    -webkit-transition: border-radius 0.5s, background-color 200ms linear, transform 0.2s linear;
+    -ms-transition: border-radius 0.5s, background-color 200ms linear, transform 0.2s linear;
+    transition: border-radius 0.5s, background-color 200ms linear, transform 0.2s linear;
+    background-color: var(--text-color);
+}
+
+button[disabled] {
+    background-color: var(--disabled-main);
+    color: var(--bg-color);
+}
+
+input[type="number"] {
+    -webkit-appearance: textfield;
+        -moz-appearance: textfield;
+            appearance: textfield;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
+
+input:hover,
+textarea:hover{
+    border: 1px solid var(--main-color);
+    -webkit-transition: border 100ms linear;
+    -ms-transition: border 100ms linear;
+    transition: border 100ms linear;
+}
+
+textarea {
+    width: 90vw;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+    outline: none;
+    border: 1px solid var(--text-color);
+}
+
+.bt {
+    font-size: 20px;
+}
+
+.newline {
+    display:block;
+}
+
+
+/*
+-------
+Popup window
+-------
+*/
+.infob {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+
+/* Content/Box */
+.infob-content {
+    background-color: var(--bg-color);
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid var(--main-color);
+    width: 80%;
+}
+
+
+/*
+-------
+Main
+-------
+*/
+.main {
+    text-align: center;
+}
+
+/*Encrypt*/
+.main > .mp {
+    margin-top: 10px;
+    border: 3px solid var(--selected-color);
+    padding: 5px;
+    background-color: var(--secondary-color);
+    display: inline-block;
+    -webkit-transition: box-shadow 0.5s, border-color 0.5s;
+    -ms-transition: box-shadow 0.5s, border-color 0.5s;
+    transition: box-shadow 0.5s, border-color 0.5s;
+}
+
+.main > .mp:hover {
+    border-color: var(--main-color);
+    box-shadow: 0 0 10px var(--main-color);
+    -webkit-transition: box-shadow 0.5s, border-color 0.5s;
+    -ms-transition: box-shadow 0.5s, border-color 0.5s;
+    transition: box-shadow 0.5s, border-color 0.5s;
+}

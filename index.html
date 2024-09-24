@@ -21,22 +21,31 @@
                     <input type="number" min="7" value="7" id="byte_length" oninput="this.value = !!this.value && Math.abs(this.value) >= 7 ? Math.abs(this.value) : null">
                 </div>
                 <div class="zero">
-                    <label for="zero_var">0 Is Unicode charcode:</label>
+                    <label for="zero_var" id="zero_vartext">0 Is Unicode charcode:</label>
                     <input type="text" placeholder="0 Unicode" value="200D" id="zero_var">
+                    <label class="switch">
+                        <input type="checkbox" id="zero_char_t" onchange="ontoggled(this,'zero_vartext')">
+                        <span class="slider"></span>
+                    </label>
                 </div>
                 <div class="one">
-                    <label for="one_var">1 Is Unicode charcode:</label>
+                    <label for="one_var" id="one_vartext">1 Is Unicode charcode:</label>
                     <input type="text" placeholder="1 Unicode" value="2062" id="one_var">
+                    <label class="switch">
+                        <input type="checkbox" id="one_char_t" onchange="ontoggled(this,'one_vartext')">
+                        <span class="slider"></span>
+                    </label>
                 </div>
                 <div class="pwd">
                     <label for="pwd_var">Password:</label>
                     <input type="text" placeholder="None" value="" id="pwd_var">
                 </div>
                 <div class="btns">
-                    <button type="button" id="encr_mode" class="selected" onclick="encrypt_mode()">Encrypt Mode</button>
-                    <button type="button" id="decr_mode" onclick="decrypt_mode()">Decrypt Mode</button>
-                    <button type="button" id="charc_mode" onclick="charc_mode()">Charcodes</button>
-                    <button type="button" id="info_mode" onclick="info_mode()">Info</button>
+                    <button type="button" id="encr_mode" class="selected" onclick="switch_mode(0)">Encrypt Mode</button>
+                    <button type="button" id="decr_mode" onclick="switch_mode(1)">Decrypt Mode</button>
+                    <button type="button" id="lcharc_mode" onclick="switch_mode(2)">List Charcodes</button>
+                    <button type="button" id="charc_mode" onclick="switch_mode(3)">Charcodes</button>
+                    <button type="button" id="info_mode" onclick="switch_mode(4)">Info</button>
                 </div>
             </div>
             <div class="encrypt">
@@ -50,8 +59,8 @@
                     <textarea id="HideMsg_encr" name="HideMsg" rows="6" cols="150">Super secret text</textarea>
                 </div>
                 <div class="encrypted">
-                    <label class="hdnmsg_text_encr newline" for="HiddenMsg">Encrypted Message:</label>
-                    <textarea disabled id="HiddenMsg_encr" name="HiddenMsg" rows="6" cols="150"></textarea>
+                    <label class="hdnmsg_text_encr newline" for="EncrMsg">Encrypted Message:</label>
+                    <textarea disabled id="HiddenMsg_encr" name="EncrMsg" rows="6" cols="150"></textarea>
                 </div>
                 <div class="btns">
                     <button type="button" id="encrypt_encr" onclick="encrypt()">Encrypt</button>
@@ -65,12 +74,32 @@
                     <textarea id="secretmsg_decr" name="HideMsg" rows="6" cols="150">Normal Looking Text</textarea>
                 </div>
                 <div class="decrypted">
-                    <label class="hdnmsg_text_decr newline" for="HiddenMsg">Decrypted Message:</label>
-                    <textarea disabled id="HiddenMsg_decr" name="HiddenMsg" rows="6" cols="150"></textarea>
+                    <label class="hdnmsg_text_decr newline" for="DecrdMsg">Decrypted Message:</label>
+                    <textarea disabled id="HiddenMsg_decr" name="DecrdMsg" rows="6" cols="150"></textarea>
                 </div>
                 <div class="btns">
                     <button type="button" id="encrypt_decr" onclick="decrypt()">Decrypt</button>
                     <button type="button" id="copy_decr" onclick="copytext('HiddenMsg_decr')" disabled>Copy</button>
+                </div>
+            </div>
+            <div class="listcharcodes">
+                <p class="lc_text">Show what are charcodes in message</p>
+                <div class="sourcetext">
+                    <label class="sc_text newline" for="ScMsg">Paste the message:</label>
+                    <textarea id="sourcetext_inp" name="ScMsg" rows="6" cols="150">Example Text</textarea>
+                </div>
+                <div class="listedcc">
+                    <label class="listedcc_text newline" id="listedcc_label" for="LccMsg">Charcodes in the message:</label>
+                    <table id="listedcc_table">
+                    <tr>
+                        <th>Character</th>
+                        <th>Charcode</th>
+                        <th>Amount</th>
+                    </tr>
+                    </table>
+                </div>
+                <div class="btns">
+                    <button type="button" id="charcodes_sh" onclick="showCharcodes()">Show</button>
                 </div>
             </div>
             <div class="charcodes">

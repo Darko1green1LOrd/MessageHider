@@ -120,6 +120,59 @@ button[disabled] {
     color: var(--bg-color);
 }
 
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    vertical-align: middle;
+    margin-right: 10px;
+    border: 1px solid transparent;
+}
+
+.switch:hover {
+    border: 1px solid var(--text-color);
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--main-color);
+    -webkit-transition: .4s;
+    -ms-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: var(--bg-color);
+    -webkit-transition: .4s;
+    -ms-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+    background-color: var(--text-color);
+}
+
 input[type="number"] {
     -webkit-appearance: textfield;
         -moz-appearance: textfield;
@@ -157,6 +210,30 @@ button:focus {
 
 .newline {
     display:block;
+}
+
+table {
+    border-collapse: collapse;
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--text-color);
+    background-color: var(--third-color);
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+td, th {
+    border: 1px solid var(--main-color);
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: var(--selected-color);
+}
+
+tr:first-child {
+    background-color: var(--btn-glow_one);
+    font-size: 15px;
 }
 
 
@@ -204,29 +281,8 @@ Main
     border: 2px dotted var(--main-color);
 }
 
-/*Encrypt*/
-.main > .encrypt {
-    margin-top: 10px;
-    border: 3px solid var(--selected-color);
-    padding: 5px;
-    background-color: var(--secondary-color);
-    display: inline-block;
-    -webkit-transition: box-shadow 0.5s, border-color 0.5s;
-    -ms-transition: box-shadow 0.5s, border-color 0.5s;
-    transition: box-shadow 0.5s, border-color 0.5s;
-}
-
-.main > .encrypt:hover {
-    border-color: var(--main-color);
-    box-shadow: 0 0 10px var(--main-color);
-    -webkit-transition: box-shadow 0.5s, border-color 0.5s;
-    -ms-transition: box-shadow 0.5s, border-color 0.5s;
-    transition: box-shadow 0.5s, border-color 0.5s;
-}
-
-
-/*decrypt*/
-.main > .decrypt {
+/*Various tabs/modes*/
+.main > div:not(:first-child) {
     display: none;
     margin-top: 10px;
     border: 3px solid var(--selected-color);
@@ -237,7 +293,7 @@ Main
     transition: box-shadow 0.5s, border-color 0.5s;
 }
 
-.main > .decrypt:hover {
+.main > div:not(:first-child):hover {
     border-color: var(--main-color);
     box-shadow: 0 0 10px var(--main-color);
     -webkit-transition: box-shadow 0.5s, border-color 0.5s;
@@ -245,42 +301,6 @@ Main
     transition: box-shadow 0.5s, border-color 0.5s;
 }
 
-/*charcodes*/
-.main > .charcodes {
+#listedcc_table, #listedcc_label {
     display: none;
-    margin-top: 10px;
-    border: 3px solid var(--selected-color);
-    padding: 5px;
-    background-color: var(--secondary-color);
-    -webkit-transition: box-shadow 0.5s, border-color 0.5s;
-    -ms-transition: box-shadow 0.5s, border-color 0.5s;
-    transition: box-shadow 0.5s, border-color 0.5s;
-}
-
-.main > .charcodes:hover {
-    border-color: var(--main-color);
-    box-shadow: 0 0 10px var(--main-color);
-    -webkit-transition: box-shadow 0.5s, border-color 0.5s;
-    -ms-transition: box-shadow 0.5s, border-color 0.5s;
-    transition: box-shadow 0.5s, border-color 0.5s;
-}
-
-/*info*/
-.main > .pageinfo {
-    display: none;
-    margin-top: 10px;
-    border: 3px solid var(--selected-color);
-    padding: 5px;
-    background-color: var(--secondary-color);
-    -webkit-transition: box-shadow 0.5s, border-color 0.5s;
-    -ms-transition: box-shadow 0.5s, border-color 0.5s;
-    transition: box-shadow 0.5s, border-color 0.5s;
-}
-
-.main > .pageinfo:hover {
-    border-color: var(--main-color);
-    box-shadow: 0 0 10px var(--main-color);
-    -webkit-transition: box-shadow 0.5s, border-color 0.5s;
-    -ms-transition: box-shadow 0.5s, border-color 0.5s;
-    transition: box-shadow 0.5s, border-color 0.5s;
 }

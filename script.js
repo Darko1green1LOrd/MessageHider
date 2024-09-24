@@ -6,10 +6,35 @@ function disableSpellcheck(){
     }
 }
 
+function udpdateLabels(){
+    const zero_label = document.querySelector('#zero_vartext');
+    const one_label = document.querySelector('#one_vartext');
+    if (document.querySelector('#zero_char_t').checked) {zero_label.textContent = zero_label.textContent.replace("Unicode charcode","Text character/s");}
+    if (document.querySelector('#one_char_t').checked) {one_label.textContent = one_label.textContent.replace("Unicode charcode","Text character/s");}
+}
+
+function runonload(){
+    disableSpellcheck();
+    udpdateLabels();
+    document.getElementsByClassName("encrypt")[0].style.display = "inline-block";
+}
+
+
+function ontoggled(checkboxElem,textid) {
+    const text_var = document.querySelector('#'+textid)
+    if (checkboxElem.checked) {
+        text_var.textContent = text_var.textContent.replace("Unicode charcode","Text character/s");
+    }
+    else {
+        text_var.textContent = text_var.textContent.replace("Text character/s","Unicode charcode");
+    }
+}
+
 function hidemsg(){
     const popup = document.querySelector('#infobox')
     popup.style.display = "none";
 }
+
 function showmsg(text){
     const popup = document.querySelector('#infobox')
     popup.style.display = "block";
@@ -26,10 +51,6 @@ function copytext(elemid) { //https://masteringjs.io/tutorials/fundamentals/copy
     element.setSelectionRange(0, element.value.length);
     document.execCommand('copy');
     element.disabled = true;
-}
-
-function runonload(){
-    disableSpellcheck();
 }
 
 function text2Binary(byte_length,text) { //https://stackoverflow.com/questions/14430633/how-to-convert-text-to-binary-code-in-javascript
@@ -57,8 +78,8 @@ function encrypt(){
     const bytelength = document.querySelector('#byte_length').valueAsNumber;
     const zero_elem = document.querySelector('#zero_var');
     const one_elem = document.querySelector('#one_var');
-    const zero = String.fromCharCode(parseInt(zero_elem.value, 16));
-    const one = String.fromCharCode(parseInt(one_elem.value, 16));
+    const zero = (document.querySelector('#zero_char_t').checked) ? zero_elem.value : String.fromCharCode(parseInt(zero_elem.value, 16));
+    const one = (document.querySelector('#one_char_t').checked) ? one_elem.value : String.fromCharCode(parseInt(one_elem.value, 16));
     const password = document.querySelector('#pwd_var').value;
     const decoymsg = document.querySelector('#DecoyMsg_encr').value;
     if(password.length > 0){var hiddenmsg = XXTEA.encryptToBase64(document.querySelector('#HideMsg_encr').value,btoa(password));}
@@ -119,8 +140,8 @@ function decrypt(){
     const bytelength = document.querySelector('#byte_length').valueAsNumber;
     const zero_elem = document.querySelector('#zero_var');
     const one_elem = document.querySelector('#one_var');
-    const zero = String.fromCharCode(parseInt(zero_elem.value, 16));
-    const one = String.fromCharCode(parseInt(one_elem.value, 16));
+    const zero = (document.querySelector('#zero_char_t').checked) ? zero_elem.value : String.fromCharCode(parseInt(zero_elem.value, 16));
+    const one = (document.querySelector('#one_char_t').checked) ? one_elem.value : String.fromCharCode(parseInt(one_elem.value, 16));
     const password = document.querySelector('#pwd_var').value;
     var hiddenmsg = document.querySelector('#secretmsg_decr').value;
     const output = document.querySelector('#HiddenMsg_decr');
@@ -142,7 +163,7 @@ function decrypt(){
         else{
             output.value = "";
             copybtn.disabled = true;
-            showmsg("This Message Doesnt contain any hidden message");
+            showmsg("This Message Doesnt contain any hidden message/characters you set for 0 and 1");
         }
     }
     else if(one == zero){
@@ -172,76 +193,74 @@ function decrypt(){
     }
 }
 
-function encrypt_mode(){
-    const encbtn = document.querySelector('#encr_mode');
-    const decrbtn = document.querySelector('#decr_mode');
-    const charcbtn = document.querySelector('#charc_mode');
-    const pinfobtn = document.querySelector('#info_mode');
-    const enc = document.getElementsByClassName("encrypt")[0];
-    const decr = document.getElementsByClassName("decrypt")[0];
-    const char = document.getElementsByClassName("charcodes")[0];
-    const pinfo = document.getElementsByClassName("pageinfo")[0];
-    encbtn.classList = "selected";
-    decrbtn.classList = "";
-    charcbtn.classList = "";
-    pinfobtn.classList = "";
-    enc.style.display = "inline-block";
-    decr.style.display = "none";
-    char.style.display = "none";
-    pinfo.style.display = "none";
-}
-function decrypt_mode(){
-    const encbtn = document.querySelector('#encr_mode');
-    const decrbtn = document.querySelector('#decr_mode');
-    const charcbtn = document.querySelector('#charc_mode');
-    const pinfobtn = document.querySelector('#info_mode');
-    const enc = document.getElementsByClassName("encrypt")[0];
-    const decr = document.getElementsByClassName("decrypt")[0];
-    const char = document.getElementsByClassName("charcodes")[0];
-    const pinfo = document.getElementsByClassName("pageinfo")[0];
-    decrbtn.classList = "selected";
-    encbtn.classList = "";
-    charcbtn.classList = "";
-    pinfobtn.classList = "";
-    decr.style.display = "inline-block";
-    enc.style.display = "none";
-    char.style.display = "none";
-    pinfo.style.display = "none";
-}
-function charc_mode(){
-    const encbtn = document.querySelector('#encr_mode');
-    const decrbtn = document.querySelector('#decr_mode');
-    const charcbtn = document.querySelector('#charc_mode');
-    const pinfobtn = document.querySelector('#info_mode');
-    const enc = document.getElementsByClassName("encrypt")[0];
-    const decr = document.getElementsByClassName("decrypt")[0];
-    const char = document.getElementsByClassName("charcodes")[0];
-    const pinfo = document.getElementsByClassName("pageinfo")[0];
-    decrbtn.classList = "";
-    encbtn.classList = "";
-    charcbtn.classList = "selected";
-    pinfobtn.classList = "";
-    decr.style.display = "none";
-    enc.style.display = "none";
-    char.style.display = "inline-block";
-    pinfo.style.display = "none";
+function showCharcodes(){
+    var input = document.querySelector('#sourcetext_inp').value;
+    const output = document.querySelector('#listedcc_table');
+    const output_label = document.querySelector('#listedcc_label');
+
+    if(input.length > 0){
+        var all_chars = {};
+        var inputLength = input.length;
+        for (var Inpi = 0; Inpi < inputLength; Inpi++) {
+            var curr_char = input.charAt(Inpi);
+            var curr_charc = input.charCodeAt(Inpi).toString(16);
+            if (curr_char in all_chars){all_chars[curr_char][1]++;}
+            else{all_chars[curr_char] = [curr_charc,1];}
+        }
+
+        var old_tbody = output.childNodes[1];
+        var new_tbody = document.createElement('tbody');
+        old_tbody.parentNode.replaceChild(new_tbody, old_tbody) //https://stackoverflow.com/a/7271547
+        var row = output.insertRow(0);
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        var cell3 = row.insertCell(2);
+        cell1.innerHTML = "Character";
+        cell2.innerHTML = "Charcode";
+        cell3.innerHTML = "Amount";
+        var all_chars_length = Object.keys(all_chars).length;
+        for (var aci = 0; aci < all_chars_length; aci++) {
+            var curr_char = Object.keys(all_chars)[aci];
+            var curr_charc = all_chars[curr_char][0];
+            var curr_count = all_chars[curr_char][1];
+            var row = output.insertRow(aci+1);
+            var cell1 = row.insertCell(0);
+            var cell2 = row.insertCell(1);
+            var cell3 = row.insertCell(2);
+            cell1.innerHTML = curr_char;
+            cell2.innerHTML = curr_charc;
+            cell3.innerHTML = curr_count;
+        }
+
+        output.style.display = "inline-block";
+        output.style.display = "inline-block";
+    }
+    else{
+        output.style.display = "";
+        output.style.display = "";
+        showmsg("First field cannot be empty");
+    }
 }
 
-function info_mode(){
+function switch_mode(ind){
     const encbtn = document.querySelector('#encr_mode');
     const decrbtn = document.querySelector('#decr_mode');
+    const lcharcbtn = document.querySelector('#lcharc_mode');
     const charcbtn = document.querySelector('#charc_mode');
     const pinfobtn = document.querySelector('#info_mode');
     const enc = document.getElementsByClassName("encrypt")[0];
     const decr = document.getElementsByClassName("decrypt")[0];
+    const lchar = document.getElementsByClassName("listcharcodes")[0];
     const char = document.getElementsByClassName("charcodes")[0];
     const pinfo = document.getElementsByClassName("pageinfo")[0];
-    decrbtn.classList = "";
-    encbtn.classList = "";
-    charcbtn.classList = "";
-    pinfobtn.classList = "selected";
-    decr.style.display = "none";
-    enc.style.display = "none";
-    char.style.display = "none";
-    pinfo.style.display = "inline-block";
+    encbtn.classList = (ind == 0) ? "selected" : "";
+    decrbtn.classList = (ind == 1) ? "selected" : "";
+    lcharcbtn.classList = (ind == 2) ? "selected" : "";
+    charcbtn.classList = (ind == 3) ? "selected" : "";
+    pinfobtn.classList = (ind == 4) ? "selected" : "";
+    enc.style.display = (ind == 0) ? "inline-block" : "";
+    decr.style.display = (ind == 1) ? "inline-block" : "";
+    lchar.style.display = (ind == 2) ? "inline-block" : "";
+    char.style.display = (ind == 3) ? "inline-block" : "";
+    pinfo.style.display = (ind == 4) ? "inline-block" : "";
 }

@@ -31,16 +31,27 @@ function ontoggled(checkboxElem,textid) {
 }
 
 function hidemsg(){
-    const popup = document.querySelector('#infobox')
-    popup.style.display = "none";
+    const trigger = document.querySelector('#infobox-t');
+    trigger.checked = false;
 }
 
-function showmsg(text){
-    const popup = document.querySelector('#infobox')
-    popup.style.display = "block";
-    document.getElementById("popup_text").textContent = text;
+function showmsg(titlevar,text1var,text2var="",duration=6000){
+    const trigger = document.querySelector('#infobox-t');
+    const title = document.querySelector('#infobox-title');
+    const text_1 = document.querySelector('#infobox-first');
+    const text_2 = document.querySelector('#infobox-second');
+    const ib_button = document.querySelector('#infobox-btn');
 
-    setTimeout(hidemsg, 3000);
+    title.innerHTML = titlevar;
+    text_1.innerHTML = text1var;
+    text_2.innerHTML = text2var;
+    trigger.checked = true;
+
+    if(duration == 0){ib_button.style.display = "block";}
+    else{
+        ib_button.style.display = "none";
+        setTimeout(hidemsg, duration);
+    }
 }
 
 function copytext(elemid) { //https://masteringjs.io/tutorials/fundamentals/copy-to-clipboard
@@ -54,13 +65,19 @@ function copytext(elemid) { //https://masteringjs.io/tutorials/fundamentals/copy
 }
 
 function text2Binary(byte_length,text) { //https://stackoverflow.com/questions/14430633/how-to-convert-text-to-binary-code-in-javascript
-    var length = text.length,
-        output = [];
-    for (var i = 0;i < length; i++) {
-        var bin = text[i].charCodeAt().toString(2);
-        output.push(Array(byte_length-bin.length+1).join("0") + bin);
+    var saved_bn = ""
+    if(isNaN(byte_length)){
+        var minimal_bl = 0
+        for (var i = 0; i < text.length; i++) {
+            var curr_bl = text[i].charCodeAt(0).toString(2).length;
+            if(minimal_bl < curr_bl){minimal_bl = curr_bl;}
+        }
+        byte_length = minimal_bl
+        saved_bn = Number(byte_length).toString(2);
     }
-    return output.join("");
+    var return_var = text.split('').map((char) => char.charCodeAt(0).toString(2).padStart(byte_length,'0')).join('');
+    return [return_var,saved_bn];
+
 }
 
 function binary2Text(byte_length,text) { //https://stackoverflow.com/questions/14430633/how-to-convert-text-to-binary-code-in-javascript https://stackoverflow.com/questions/3172985/javascript-use-variable-in-string-match
@@ -82,114 +99,127 @@ function encrypt(){
     const one = (document.querySelector('#one_char_t').checked) ? one_elem.value : String.fromCharCode(parseInt(one_elem.value, 16));
     const password = document.querySelector('#pwd_var').value;
     const decoymsg = document.querySelector('#DecoyMsg_encr').value;
-    if(password.length > 0){var hiddenmsg = XXTEA.encryptToBase64(document.querySelector('#HideMsg_encr').value,btoa(password));}
-    else{var hiddenmsg = document.querySelector('#HideMsg_encr').value;}
+    const compression = document.querySelector('#compr_t').checked;
+    var input_var = document.querySelector('#HideMsg_encr').value;
+    if(compression){input_var = LZString.compress(input_var);}
+    if(password.length > 0){var hiddenmsg = XXTEA.encryptToBase64(input_var,btoa(password));}
+    else{var hiddenmsg = input_var;}
     const output = document.querySelector('#HiddenMsg_encr');
-    const copybtn = document.querySelector('#copy_encr')
+    const copybtn = document.querySelector('#copy_encr');
 
-    if(hiddenmsg.length > 0 && zero != one && zero_elem.value.length > 0 && one_elem.value.length > 0 && isNaN(bytelength) == false){
+    if(hiddenmsg.length > 0 && zero != one && zero_elem.value.length > 0 && one_elem.value.length > 0){
         try{
             var bin_encoded = text2Binary(bytelength,hiddenmsg);
-            var btn_hidden = bin_encoded.replaceAll("0",zero).replaceAll("1",one)
+            var bin_hidden = bin_encoded[0].replaceAll("0",zero).replaceAll("1",one)
+            var bin_bl = bin_encoded[1].replaceAll("0",zero).replaceAll("1",one)
             var i = decoymsg.indexOf(' ');
             var decoy_splits = [decoymsg.slice(0,i), decoymsg.slice(i+1)];
             copybtn.disabled = false;
-            if(decoymsg.length == 0){output.value = btn_hidden;}
-            else if(decoymsg.split(" ").length > 1){output.value = decoy_splits[0]+btn_hidden+" "+decoy_splits[1];}
+            if(decoymsg.length == 0 && bin_bl.length >= 1){output.value = bin_hidden+" "+bin_bl+decoy_splits[1];;}
+            else if(decoymsg.length == 0 && bin_bl.length <= 0){output.value = bin_hidden}
+            else if(decoymsg.split(" ").length > 1){output.value = decoy_splits[0]+bin_hidden+" "+bin_bl+decoy_splits[1];}
             else {
                 output.value = "";
                 copybtn.disabled = true;
-                showmsg("Decoy msg has to be either empty or contain atleast one space");
+                showmsg("Info!","Decoy msg has to be either empty or contain atleast one space");
             }
         }
         catch (e){
             copybtn.disabled = true;
             output.value = "";
-            if (e instanceof RangeError){showmsg("Hiding error, characters like ľščťžýáíéđŧø can cause this");}
-            else{showmsg("Hiding error, reason unknown   "+e);}
+            showmsg("Error","Hiding error, reason unknown",e,0);
         }
     }
     else if(one == zero){
         copybtn.disabled = true;
         output.value = "";
-        showmsg("Zero and one cannot be the same unicode");
-    }
-    else if(isNaN(bytelength)){
-        copybtn.disabled = true;
-        output.value = "";
-        showmsg("Byte Length Cannot be nothing");
+        showmsg("Info!","Zero and one cannot be the same unicode");
     }
     else if(zero_elem.value.length == 0){
         copybtn.disabled = true;
         output.value = "";
-        showmsg("Zero cannot be nothing");
+        showmsg("Info!","Zero cannot be nothing");
     }
     else if(one_elem.value.length == 0){
         copybtn.disabled = true;
         output.value = "";
-        showmsg("One cannot be nothing");
+        showmsg("Info!","One cannot be nothing");
     }
     else{
         copybtn.disabled = true;
         output.value = "";
-        showmsg("You havent set any hidden message");
+        showmsg("Info!","You havent set any hidden message");
     }
 }
 
 function decrypt(){
-    const bytelength = document.querySelector('#byte_length').valueAsNumber;
+    var bytelength = document.querySelector('#byte_length').valueAsNumber;
     const zero_elem = document.querySelector('#zero_var');
     const one_elem = document.querySelector('#one_var');
     const zero = (document.querySelector('#zero_char_t').checked) ? zero_elem.value : String.fromCharCode(parseInt(zero_elem.value, 16));
     const one = (document.querySelector('#one_char_t').checked) ? one_elem.value : String.fromCharCode(parseInt(one_elem.value, 16));
     const password = document.querySelector('#pwd_var').value;
-    var hiddenmsg = document.querySelector('#secretmsg_decr').value;
+    var hiddenmsg = document.querySelector('#secretmsg_decr').value.split(" ")[0];
+    var saved_bl = document.querySelector('#secretmsg_decr').value.split(" ")[1];
+    const compression = document.querySelector('#compr_t').checked
     const output = document.querySelector('#HiddenMsg_decr');
     const copybtn = document.querySelector('#copy_decr')
     copybtn.disabled = false;
 
-    if(hiddenmsg.length > 0 && zero != one && zero_elem.value.length > 0 && one_elem.value.length > 0 && isNaN(bytelength) == false){
+    if(hiddenmsg.length > 0 && zero != one && zero_elem.value.length > 0 && one_elem.value.length > 0){
         if(hiddenmsg.includes(zero) ||hiddenmsg.includes(one)){
             var regrem = new RegExp('[^'+zero+one+']', 'g');
             hiddenmsg = hiddenmsg.replace(regrem,"");
             hiddenmsg = hiddenmsg.replaceAll(zero,"0").replaceAll(one,"1");
-            if(password.length > 0){
-                try{var decrypted_text = XXTEA.decryptFromBase64(binary2Text(bytelength,hiddenmsg),btoa(password));}
-                catch (e){showmsg("The message you are trying to decrypt is not password locked or the password is incorrect");}
+            if(saved_bl == null){
+                output.value = "";
+                copybtn.disabled = true;
+                showmsg("Info!","This Message Wasnt encrypted in Auto Mode, Byte Length Cannot be auto");
             }
-            else{var decrypted_text = binary2Text(bytelength,hiddenmsg);}
-            output.value = decrypted_text;
+            else{
+                saved_bl = saved_bl.replace(regrem,"");
+                saved_bl = saved_bl.replaceAll(zero,"0").replaceAll(one,"1");
+                if(saved_bl.length <= 0 && isNaN(bytelength)){
+                    output.value = "";
+                    copybtn.disabled = true;
+                    showmsg("Info!","This Message Wasnt encrypted in Auto Mode, Byte Length Cannot be auto");
+                }
+                else{
+                    if(isNaN(bytelength)){bytelength = parseInt(saved_bl, 2);}
+                    if(password.length > 0){
+                        try{var decrypted_text = XXTEA.decryptFromBase64(binary2Text(bytelength,hiddenmsg),btoa(password));}
+                        catch (e){showmsg("Info!","The message you are trying to decrypt is not password locked or the password is incorrect");}
+                    }
+                    else{var decrypted_text = binary2Text(bytelength,hiddenmsg);}
+                    output.value = (compression) ? LZString.decompress(decrypted_text) : decrypted_text;
+                }
+            }
         }
         else{
             output.value = "";
             copybtn.disabled = true;
-            showmsg("This Message Doesnt contain any hidden message/characters you set for 0 and 1");
+            showmsg("Info!","This Message Doesnt contain any hidden message","or characters you set for 0 and 1");
         }
     }
     else if(one == zero){
         output.value = "";
         copybtn.disabled = true;
-        showmsg("Zero and one cannot be the same unicode");
-    }
-    else if(isNaN(bytelength)){
-        output.value = "";
-        copybtn.disabled = true;
-        showmsg("Byte Length Cannot be nothing");
+        showmsg("Info!","Zero and one cannot be the same unicode");
     }
     else if(zero_elem.value.length == 0){
         output.value = "";
         copybtn.disabled = true;
-        showmsg("Zero cannot be nothing");
+        showmsg("Info!","Zero cannot be nothing");
     }
     else if(one_elem.value.length == 0){
         output.value = "";
         copybtn.disabled = true;
-        showmsg("One cannot be nothing");
+        showmsg("Info!","One cannot be nothing");
     }
     else{
         output.value = "";
         copybtn.disabled = true;
-        showmsg("First field cannot be empty");
+        showmsg("Info!","First field cannot be empty");
     }
 }
 
@@ -238,7 +268,7 @@ function showCharcodes(){
     else{
         output.style.display = "";
         output.style.display = "";
-        showmsg("First field cannot be empty");
+        showmsg("Info!","First field cannot be empty");
     }
 }
 

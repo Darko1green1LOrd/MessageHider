@@ -168,13 +168,13 @@ function encrypt(){
                 disable(output,copybtn);
                 showmsg("Info!","Decoy msg has to be either empty or contain atleast one space");
             }
-            calcLength(output);
         }
         catch (e){
             disable(output,copybtn);
             showmsg("Error","Hiding error, reason unknown",e,0);
         }
     }
+    calcLength(output);
 }
 
 function decrypt(){
@@ -236,7 +236,6 @@ function decrypt(){
                     }
                     else{var decrypted_text = binary2Text(bytelength,hiddenmsg);}
                     if(cont){output.value = (compression) ? LZString.decompress(decrypted_text) : decrypted_text;}
-                    calcLength(output);
                 }
             }
         }
@@ -245,6 +244,7 @@ function decrypt(){
             showmsg("Info!","This Message Doesnt contain any hidden message","or characters you set for 0 and 1");
         }
     }
+    calcLength(output);
 }
 
 function showCharcodes(){

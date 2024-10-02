@@ -73,6 +73,13 @@ input, textarea {
     color: var(--text-color);
 }
 
+.length_txt {
+    color: var(--text-color);
+    font-size: 16px;
+    margin-bottom: 10px;
+    margin-top: -5px;
+}
+
 #pwd_var {
     width: 300px;
 }

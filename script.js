@@ -59,6 +59,8 @@ function runonload(){
     disableSpellcheck();
     udpdateLabels();
     setup_ChangeDetectors();
+    run_customselect();
+    changetheme();
     ge("encrypt","geba").style.display = "inline-block";
 }
 
@@ -71,16 +73,62 @@ function update_textfields(){
     }
 }
 
+function changetheme(inp=null,elem=null){
+    if(inp == null){inp = ge("stylesel-db").value;}
+    let root = document.documentElement;
+    ge("stylesel_div").style.display = (inp == "c") ? "block" : "";
+    ge("stylesel_emergency_toggle","geba").style.display = (inp == "c") ? "block" : "";
+    ge("emergency_sr").style.display = (inp == "c" && ge("stylesel_t").checked) ? "block" : "";
+
+    if (inp == "reset"){
+        ge("stylesel-db").selectedIndex = 1
+        const selected_itm = ge("stylesel-db");
+        ge("select-selected","geba").innerHTML = selected_itm.options[selected_itm.selectedIndex].innerHTML;
+    }
+
+    var styles = {
+        "dg":{
+            "--bodycolor": "#000",
+            "--inputcolor": "#171817",
+            "--contpanel-colone": "none",
+            "--contpanel-coltwo": "none"
+        }
+    }
+
+    var all_stylevars = ge("stylesel_table").children[0].children;
+    var all_stylevars_length = all_stylevars.length;
+    for (var asv = 1; asv < all_stylevars_length; asv++) {
+        elem = all_stylevars[asv].children[1].children[0];
+        if (inp != "c"){elem.value = elem.dataset.defvalue;}
+        if (Object.keys(styles).indexOf(inp) != -1){ //Check if the selected input is in styles
+            if (Object.keys(styles[inp]).indexOf(elem.dataset.varid) != -1){
+                elem.value = styles[inp][elem.dataset.varid];
+            }
+        }
+        var colortile = elem.parentElement.parentElement.children[2];
+        colortile.style.backgroundColor = "";colortile.style.backgroundColor = (elem.value != "") ? elem.value : elem.dataset.defvalue;
+        root.style.setProperty(elem.dataset.varid, elem.value);
+    }
+}
+
 function settingChanged(elem){
     const elem_id = elem.id;
     if (elem_id == "autores_t"){update_textfields();}
     else if (elem_id == "lengthc_t"){update_textfields();}
     else if (elem_id == "msgdura_v"){
         if (elem.value == ""){
-            elem.value = 6;
-            showmsg("Error","This field cannot be empty","Restoring default value");
+            elem.value = (elem.oldvalue >= 0 && elem.oldvalue <= 100) ? elem.oldvalue : 6;
+            showmsg("Error","This field cannot be empty","Restoring previous value");
         }
     }
+    else if (elem_id == "stylesel-db"){changetheme(elem.value);}
+    else if (elem.classList[0] == "customstyle"){
+        let root = document.documentElement;
+        var colortile = elem.parentElement.parentElement.children[2];
+        colortile.style.backgroundColor = "";colortile.style.backgroundColor = (elem.value != "") ? elem.value : elem.dataset.defvalue;
+        root.style.setProperty(elem.dataset.varid, elem.value);
+    }
+    else if (elem_id == "stylesel_t"){ge("emergency_sr").style.display = (ge("stylesel-db").value == "c" && ge("stylesel_t").checked) ? "block" : "";}
 
 }
 
@@ -151,7 +199,6 @@ function text2Binary(byte_length,text) { //https://stackoverflow.com/questions/1
     }
     var return_var = text.split('').map((char) => char.charCodeAt(0).toString(2).padStart(byte_length,'0')).join('');
     return [return_var,saved_bn];
-
 }
 
 function binary2Text(byte_length,text) { //https://stackoverflow.com/questions/14430633/how-to-convert-text-to-binary-code-in-javascript https://stackoverflow.com/questions/3172985/javascript-use-variable-in-string-match

@@ -4,7 +4,7 @@
     --tooltipbg-bg: rgba(20, 55, 0, 0.7);
     --main-color: #0ca21d;
     --med-color: #0ebe20;
-    --text-color : #aafbb5;
+    --text-color: #aafbb5;
     --disabled-main: #6ca271;
     --bg-color: #2b2d2b;
     --secondary-color: #131413;
@@ -13,6 +13,11 @@
     --selected-color: #000;
     --disabled-color: #442323;
     --darkgreen: #0d4208;
+    --lightgray: #373737;
+    --bodycolor: #0d4208;
+    --inputcolor: rgba(44,187,99,.35);
+    --contpanel-colone: #212922;
+    --contpanel-coltwo: rgba(20, 55, 0, 0.7);
 }
 
 
@@ -30,7 +35,7 @@ Main colorings
 
 body {
     background-size: 500% 500%;
-    background-image: linear-gradient(-45deg, var(--bg-color), var(--darkgreen), var(--bg-color) 100%);
+    background-image: linear-gradient(-45deg, var(--bg-color), var(--bodycolor), var(--bg-color) 100%);
     -webkit-animation: AnimateBG 20s ease infinite;
     animation: AnimateBG 20s ease infinite;
 }
@@ -62,7 +67,7 @@ body {
 .control-panel {
     border-radius: 10px;
     padding: 10px;
-    background-image: radial-gradient(var(--fourth-color), var(--tooltipbg-bg));
+    background-image: radial-gradient(var(--contpanel-colone), var(--contpanel-coltwo));
 }
 
 label {
@@ -78,7 +83,7 @@ input, textarea {
     vertical-align: middle;
     margin: 5px 10px 5px 0;
     padding: 10px;
-    background-color: var(--btn-glow_one);
+    background-color: var(--inputcolor);
     border: 1px solid var(--selected-color);
     color: var(--text-color);
 }
@@ -94,19 +99,11 @@ textarea[readonly] {
     margin-top: -5px;
 }
 
-#pwd_var {
-    width: 300px;
-}
-
-#byte_length {
-    width: 40px;
-}
-
 button {
     padding: 10px 20px;
     background-color: var(--main-color);
     border: 1px solid var(--bg-color);
-    color: var(---selected-color);
+    color: var(--selected-color);
     cursor: pointer;
     font-weight: 1000;
     font-size: 15px;
@@ -245,7 +242,7 @@ table {
     color: var(--text-color);
     background-color: var(--tooltipbg-bg);
     margin-top: 5px;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
 }
 
 td, th {
@@ -270,7 +267,7 @@ Popup window
 */
 .infobox {
     position: fixed;
-    z-index: 20;
+    z-index: 99;
     max-width: 85%;
     width: 500px;
     top: 50%;
@@ -395,7 +392,7 @@ Tooltip
 .tooltip:before {
     content: attr(data-text); /* here's the magic */
     position:absolute;
-    z-index: 1;
+    z-index: 98;
 
   /* vertically center */
     top:50%;
@@ -419,6 +416,98 @@ Tooltip
 
 .tooltip:hover:before {
     display:block;
+}
+
+
+/*
+-------
+Dropdown menus
+-------
+*/
+/*the container must be positioned relative:*/
+.custom-select {
+    position: relative;
+    margin: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.custom-select select {
+    display: none; /*hide original SELECT element:*/
+}
+
+.select-selected {
+    background-color: var(--bg-color);
+}
+
+/*style the arrow inside the select element:*/
+.select-selected:after {
+    position: absolute;
+    content: "";
+    top: 14px;
+    right: 10px;
+    width: 0;
+    height: 0;
+    border: 6px solid transparent;
+    border-color: var(--text-color) transparent transparent transparent;
+}
+
+/*point the arrow upwards when the select box is open (active):*/
+.select-selected.select-arrow-active:after {
+    border-color: transparent transparent var(--text-color) transparent;
+    top: 7px;
+}
+
+/*style the items (options), including the selected item:*/
+.select-items div, .select-selected {
+    color: var(--text-color);
+    padding: 8px 16px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    user-select: none;
+    max-height: 250px;
+    overflow: scroll;
+    font-weight: 1000;
+    border: 2px double var(--text-color);
+    border-bottom: none;
+    border-top: none;
+}
+
+.select-items div:last-of-type {
+    border-bottom: 2px double var(--text-color);
+}
+.select-arrow-active {
+    border-color: var(--text-color) !important;
+    border-bottom: 2px double var(--main-color) !important
+}
+
+.select-selected {
+    border: 2px double var(--main-color);
+}
+
+.select-selected:hover {
+    border-color: var(--text-color);
+}
+
+/*style items (options):*/
+.select-items {
+    position: absolute;
+    background-color: var(--lightgray);
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 97;
+    max-height: 200px;
+    overflow: scroll;
+}
+
+/*hide the items when the select box is closed:*/
+.select-hide {
+    display: none;
+}
+
+.select-items div:hover, .same-as-selected {
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 
@@ -480,4 +569,30 @@ Main
     width: fit-content;
     margin-left: auto;
     margin-right: auto;
+}
+
+#stylesel_div, .stylesel_emergency_toggle {
+    display: none;
+}
+
+#emergency_sr {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    padding: unset;
+    border: none;
+    box-shadow: unset !important;
+    border-radius: unset !important;
+    display: none;
+    background-color: #171817;
+    color: #aafbb5;
+    border: 2px double #0ca21d;
+}
+
+#pwd_var {
+    width: 300px;
+}
+
+#byte_length {
+    width: 40px;
 }

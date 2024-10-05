@@ -210,6 +210,7 @@ input:checked + .toggle:before {
     background: var(--bg-color);
     display:inline-block;
     width: 20vw;
+    accent-color: var(--main-color);
 }
 
 .slider::-webkit-slider-thumb {

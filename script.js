@@ -152,13 +152,20 @@ function settingChanged(elem){
             else {h_value = elem.oldvalue;}
         }
         elem.value = h_value;
+        if (elem.oldvalue != elem.value){
+            ge("huer_t").checked = false;
+        }
     }
     else if (elem_id == "huer_t"){
         if(elem.checked){
+            var moveto_right = true;
             var IntervalLoop = setInterval(function() {
                 var slider_elem = ge("huer_s");
                 var value_elem = ge("huer_v");
-                slider_elem.value = (Number(slider_elem.value) < 360 && Number(slider_elem.value) >= 0) ? Number(slider_elem.value)+1 : 0;
+                if (slider_elem.value == 360){moveto_right = false;}
+                else if (slider_elem.value == 0){moveto_right = true;}
+                if (moveto_right){slider_elem.value = Number(slider_elem.value)+1;}
+                else{slider_elem.value = Number(slider_elem.value)-1;}
                 value_elem.value = slider_elem.value;
                 document.body.style.filter = `hue-rotate(${value_elem.value}deg)`;
                 if (elem.checked != true){clearInterval(IntervalLoop);}

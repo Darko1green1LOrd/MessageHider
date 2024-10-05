@@ -61,6 +61,8 @@ function runonload(){
     setup_ChangeDetectors();
     run_customselect();
     changetheme();
+    settingChanged(ge("huer_s"));
+    settingChanged(ge("huer_t"));
     ge("encrypt","geba").style.display = "inline-block";
 }
 
@@ -122,14 +124,47 @@ function settingChanged(elem){
         }
     }
     else if (elem_id == "stylesel-db"){changetheme(elem.value);}
-    else if (elem.classList[0] == "customstyle"){
+    else if (elem.classList[0] == "customstyle" && elem_id == ""){
         let root = document.documentElement;
         var colortile = elem.parentElement.parentElement.children[2];
         colortile.style.backgroundColor = "";colortile.style.backgroundColor = (elem.value != "") ? elem.value : elem.dataset.defvalue;
         root.style.setProperty(elem.dataset.varid, elem.value);
     }
     else if (elem_id == "stylesel_t"){ge("emergency_sr").style.display = (ge("stylesel-db").value == "c" && ge("stylesel_t").checked) ? "block" : "";}
-
+    else if (elem_id == "huer_s"){
+        ge("huer_v").value = elem.value;
+        document.body.style.filter = `hue-rotate(${elem.value}deg)`;
+    }
+    else if (elem_id == "huer_v"){
+        var h_value = elem.value;
+        if (elem.value == ""){
+            if (elem.oldvalue == ""){h_value = 0;}
+            else {h_value = elem.oldvalue;}
+        }
+        ge("huer_s").value = h_value;
+        elem.value = h_value;
+        document.body.style.filter = `hue-rotate(${h_value}deg)`;
+    }
+    else if (elem_id == "huer_vi"){
+        var h_value = elem.value;
+        if (elem.value == ""){
+            if (elem.oldvalue == ""){h_value = 0;}
+            else {h_value = elem.oldvalue;}
+        }
+        elem.value = h_value;
+    }
+    else if (elem_id == "huer_t"){
+        if(elem.checked){
+            var IntervalLoop = setInterval(function() {
+                var slider_elem = ge("huer_s");
+                var value_elem = ge("huer_v");
+                slider_elem.value = (Number(slider_elem.value) < 360 && Number(slider_elem.value) >= 0) ? Number(slider_elem.value)+1 : 0;
+                value_elem.value = slider_elem.value;
+                document.body.style.filter = `hue-rotate(${value_elem.value}deg)`;
+                if (elem.checked != true){clearInterval(IntervalLoop);}
+            }, Number(ge("huer_vi").value));
+        }
+    }
 }
 
 function ge(elem,mode="gebi"){

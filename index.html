@@ -27,7 +27,7 @@
                     <input type="text" placeholder="0 Unicode" value="200D" id="zero_var">
                     <label class="switch">
                         <input type="checkbox" id="zero_char_t" onchange="ontoggled(this,'zero_vartext')">
-                        <span class="slider"></span>
+                        <span class="toggle"></span>
                     </label>
                 </div>
                 <div class="one">
@@ -35,7 +35,7 @@
                     <input type="text" placeholder="1 Unicode" value="2062" id="one_var">
                     <label class="switch">
                         <input type="checkbox" id="one_char_t" onchange="ontoggled(this,'one_vartext')">
-                        <span class="slider"></span>
+                        <span class="toggle"></span>
                     </label>
                 </div>
                 <div class="pwd">
@@ -46,7 +46,7 @@
                     <label for="compr_var">Compression </label>
                     <label class="switch">
                         <input type="checkbox" id="compr_t">
-                        <span class="slider"></span>
+                        <span class="toggle"></span>
                     </label>
                     <span data-text="Only reccomended for longer texts" class="tooltip">?</span>
                 </div>
@@ -140,7 +140,7 @@
                         <label for="autores_var" >Auto Resize</label>
                         <label class="switch">
                             <input type="checkbox" id="autores_t" onchange="settingChanged(this)" checked>
-                            <span class="slider"></span>
+                            <span class="toggle"></span>
                         </label>
                         <span data-text="Automatically resizes some textfields based on how much space is needed" class="tooltip">?</span>
                     </div>
@@ -148,7 +148,7 @@
                         <label for="lengthc_var" >Length Calculation</label>
                         <label class="switch">
                             <input type="checkbox" id="lengthc_t" onchange="settingChanged(this)" checked>
-                            <span class="slider"></span>
+                            <span class="toggle"></span>
                         </label>
                         <span data-text="Calculates how long the text is in some text fields" class="tooltip">?</span>
                     </div>
@@ -157,6 +157,24 @@
                         <input type="number" min="0" max="100" value="6" id="msgdura_v" placeholder="Cannot be Empty" onfocus="this.oldvalue = this.value;" onchange="settingChanged(this)" oninput="this.value = !!this.value && Math.abs(this.value) >= 0  && Math.abs(this.value) <= 100 ? Math.abs(this.value) : null">
                         <span data-text="Controls default info box duration in seconds, set this to 0 to have infinite duration with manual dismissal" class="tooltip">?</span>
                         <button type="button" id="msgdura_b" onclick="showmsg('This is a test message','Example text','With your set duration');">Test</button>
+                    </div>
+                    <div class="huer">
+                        <label for="huer_var" >Color/Hue Rotation</label>
+                        <div>
+                            <label for="huer_varman" >Manual</label>
+                            <input type="range" min="0" max="360" value="0" class="slider" id="huer_s" oninput="settingChanged(this)">
+                            <input type="number" min="0" max="360" value="0" id="huer_v" placeholder="" onfocus="this.oldvalue = this.value;" onchange="settingChanged(this)" oninput="this.value = !!this.value && Math.abs(this.value) >= 0  && Math.abs(this.value) <= 360 ? Math.abs(this.value) : null">
+                            <span data-text="Allows you to easly change color of the site" class="tooltip">?</span>
+                        </div>
+                        <div>
+                            <label for="huer_varauto" >Auto</label>
+                            <label class="switch">
+                                <input type="checkbox" id="huer_t" onchange="settingChanged(this)">
+                                <span class="toggle"></span>
+                            </label>
+                            <input type="number" min="1" max="6000" value="100" id="huer_vi" placeholder="" onfocus="this.oldvalue = this.value;" onchange="settingChanged(this)" oninput="this.value = !!this.value && Math.abs(this.value) >= 1  && Math.abs(this.value) <= 6000 ? Math.abs(this.value) : null">
+                            <span data-text="Set a interval(MiliSeconds) for automated color changing" class="tooltip">?</span>
+                        </div>
                     </div>
                     <div class="stylesel">
                         <label for="stylesel_var" >Theme</label>
@@ -172,7 +190,7 @@
                             <label for="stylesel_vartwo" >Emergency Button Toggle</label>
                             <label class="switch">
                                 <input type="checkbox" id="stylesel_t" onchange="settingChanged(this)" checked>
-                                <span class="slider"></span>
+                                <span class="toggle"></span>
                             </label>
                             <span data-text="Toggle to hide / show the emergency button to reset the theme in case you make the site unuseable with some color combinations" class="tooltip">?</span>
                         </div>

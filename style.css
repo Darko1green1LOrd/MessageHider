@@ -33,11 +33,21 @@ Main colorings
     font-size: 16px;
 }
 
+html {
+    background: black;
+    height: 100%;
+}
+
+html, body {
+    margin: 0;
+}
+
 body {
     background-size: 500% 500%;
     background-image: linear-gradient(-45deg, var(--bg-color), var(--bodycolor), var(--bg-color) 100%);
     -webkit-animation: AnimateBG 20s ease infinite;
     animation: AnimateBG 20s ease infinite;
+    min-height: 100%;
 }
 
 @-webkit-keyframes AnimateBG {
@@ -163,7 +173,7 @@ button[disabled] {
     border: 1px solid var(--text-color);
 }
 
-.slider {
+.toggle {
     position: absolute;
     cursor: pointer;
     top: 0;
@@ -176,7 +186,7 @@ button[disabled] {
     transition: .4s;
 }
 
-.slider:before {
+.toggle:before {
     position: absolute;
     content: "";
     height: 26px;
@@ -189,11 +199,41 @@ button[disabled] {
     transition: .4s;
 }
 
-input:checked + .slider:before {
+input:checked + .toggle:before {
     -webkit-transform: translateX(26px);
     -ms-transform: translateX(26px);
     transform: translateX(26px);
     background-color: var(--text-color);
+}
+
+.slider {
+    background: var(--bg-color);
+    display:inline-block;
+    width: 20vw;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    background: var(--main-color);
+    cursor: pointer;
+}
+
+.slider:focus::-webkit-slider-thumb {
+    background: var(--text-color);
+}
+
+.slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    background: var(--main-color);
+    cursor: pointer;
+}
+
+.slider:focus::-moz-range-thumb {
+    background: var(--text-color);
 }
 
 input[type="number"] {
@@ -539,6 +579,7 @@ Main
     -webkit-transition: box-shadow 0.5s, border-color 0.5s;
     -ms-transition: box-shadow 0.5s, border-color 0.5s;
     transition: box-shadow 0.5s, border-color 0.5s;
+    margin-bottom: 50px;
 }
 
 .main > div:not(:first-child):hover {
@@ -595,4 +636,8 @@ Main
 
 #byte_length {
     width: 40px;
+}
+
+#msgdura_v {
+    width: 160px;
 }

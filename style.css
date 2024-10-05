@@ -618,8 +618,8 @@ Main
 }
 
 #emergency_sr {
-    position: fixed;
-    bottom: 10px;
+    position: absolute;
+    top: 10px;
     right: 10px;
     padding: unset;
     border: none;
@@ -641,4 +641,18 @@ Main
 
 #msgdura_v {
     width: 160px;
+}
+
+#uid_storage {
+    width: unset;
+    resize: none;
+    display: none;
+}
+
+#shares_text {
+    widtH: 60vw;
+}
+
+.shares {
+    padding: 10px;
 }

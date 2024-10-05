@@ -300,10 +300,21 @@
                             </table>
                         </div>
                     </div>
+                    <div class="shares">
+                        <textarea readonly="readonly" id="shares_text" name="shares_text" rows="6" cols="150"></textarea>
+                        <label id="shares_l" class="length_txt newline" for="DecoyMsg"></label>
+                        <div>
+                            <label for="shares_var" >Share Settings</label>
+                            <button type="button" id="shares_b" onclick="settingChanged(this)">Share</button>
+                            <span data-text="Generate a link so you can easly share this page with the exact settings you have" class="tooltip">?</span>
+                            <button type="button" id="copy_shares" onclick="copytext('shares_text')" disabled>Copy</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         <button type="button" id="emergency_sr" onclick="changetheme('reset');">Reset Theme</button>
+        <textarea readonly="readonly" id="uid_storage" name="uid_storage" rows="1" cols="10"></textarea>
         <!-- The Modal/popup info box -->
         <div class="infobox_container">
             <!-- Here is the hidden checkbox element which makes toggling the modal work -->

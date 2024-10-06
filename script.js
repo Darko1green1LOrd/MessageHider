@@ -731,7 +731,7 @@ function switch_mode(ind){
     else{
         var all_btns = [encbtn.classList[0],decrbtn.classList[0],lcharcbtn.classList[0],charcbtn.classList[0],pinfobtn.classList[0],settingsmbtn.classList[0]];
         var sel_mode = all_btns.indexOf("selected");
-        var all_tabs = [enc,decr,lchar,char,pinfo,settingsm]
+        var all_tabs = [enc,decr,lchar,char,pinfo,settingsm];
         var all_tabs_length = all_tabs.length;
         for (var ati = 0; ati < all_tabs_length; ati++) {
             if (ind == "showall"){

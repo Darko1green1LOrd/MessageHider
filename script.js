@@ -37,8 +37,8 @@ function calcLength(source_elem,grab=false){
 
 const inputHandler = function(e){calcLength(e.target);} //https://stackoverflow.com/questions/574941/best-way-to-track-onchange-as-you-type-in-input-type-text
 
-var sources = ["DecoyMsg_encr","HideMsg_encr","secretmsg_decr","sourcetext_inp"]
-var outputs = ["DHiddenMsg_decr","HiddenMsg_encr","shares_text"]
+var sources = ["DecoyMsg_encr","HideMsg_encr","secretmsg_decr","sourcetext_inp"];
+var outputs = ["DHiddenMsg_decr","HiddenMsg_encr","shares_text"];
 
 function setup_ChangeDetectors(){
     var sources_length = sources.length

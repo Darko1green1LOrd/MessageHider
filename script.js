@@ -56,14 +56,14 @@ function setup_ChangeDetectors(){
 }
 
 function runonload(){
+    run_customselect();
     disableSpellcheck();
+    get_saved_data();
     udpdateLabels();
     setup_ChangeDetectors();
-    run_customselect();
     changetheme();
     settingChanged(ge("huer_s"));
     settingChanged(ge("huer_t"));
-    get_saved_data();
     ge("encrypt","geba").style.display = "inline-block";
     if (ge("shares_text").value != ""){ge("copy_shares").disabled = false;}
 }

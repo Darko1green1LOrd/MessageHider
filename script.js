@@ -6,6 +6,16 @@ function disableSpellcheck(){
     }
 }
 
+function changeicon(icon){
+    var link = document.querySelector("link[rel~='icon']");
+    if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+    }
+    link.href = icon;
+}
+
 function udpdateLabels(){
     const zero_label = ge('zero_vartext');
     const one_label = ge('one_vartext');
@@ -59,6 +69,7 @@ function runonload(){
     run_customselect();
     disableSpellcheck();
     get_saved_data();
+    changeicon("favicon.ico");
     udpdateLabels();
     setup_ChangeDetectors();
     changetheme();

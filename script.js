@@ -289,6 +289,7 @@ function load_data(elem,value,type,tsc,min,max,uique_id){
     if (type == "dropdown"){dropdown_change(elem,value);}
     else if (type == "inputbox"){elem.value = value;}
     else if (type == "pwinputbox"){elem.value = XXTEA.decryptFromBase64(decodeURIComponent(value),uique_id);}
+    else if (type == "htmlvar"){elem.innerHTML = value;}
     else if (type == "slider"){slider_change(elem,value);}
     else if (type == "toggle"){elem.checked = value;}
     else if (type == "var"){eval(elem + " = " + value);}

@@ -48,7 +48,7 @@ function calcLength(source_elem,grab=false){
 const inputHandler = function(e){calcLength(e.target);} //https://stackoverflow.com/questions/574941/best-way-to-track-onchange-as-you-type-in-input-type-text
 
 var sources = ["DecoyMsg_encr","HideMsg_encr","secretmsg_decr","sourcetext_inp"];
-var outputs = ["DHiddenMsg_decr","HiddenMsg_encr","shares_text"];
+var outputs = ["DHiddenMsg_decr","HiddenMsg_encr","shares_text","pginfo"];
 
 function setup_ChangeDetectors(){
     var sources_length = sources.length
@@ -68,13 +68,15 @@ function setup_ChangeDetectors(){
 function runonload(){
     run_customselect();
     disableSpellcheck();
-    get_saved_data();
+    try{get_saved_data();}
+    catch (e){console.log("Failed to load saved data from url  "+e);}
     changeicon("favicon.ico");
     udpdateLabels();
     setup_ChangeDetectors();
     changetheme();
     settingChanged(ge("huer_s"));
     settingChanged(ge("huer_t"));
+    settingChanged(ge("stegc_t"));
     ge("encrypt","geba").style.display = "inline-block";
     if (ge("shares_text").value != ""){ge("copy_shares").disabled = false;}
 }
@@ -90,6 +92,8 @@ function save_data_in_url(url=document.URL){
     const unique_id = genstr(10);
     const ares = ge("autores_t").checked;
     const lcalc = ge("lengthc_t").checked;
+    const sc_hmac_t = ge("stegc_hmac_t").checked;
+    const sc_t = ge("stegc_t").checked;
     const bl = encodeURIComponent(XXTEA.encryptToBase64(ge("byte_length").value,unique_id));
     const zv = encodeURIComponent(XXTEA.encryptToBase64(ge("zero_var").value,unique_id));
     const zt = ge("zero_char_t").checked;
@@ -108,10 +112,10 @@ function save_data_in_url(url=document.URL){
             elem = all_stylevars[asv].children[1].children[0];
             styles["loaded"][elem.dataset.varid] = elem.value;
         }
-        ctheme = "&ctheme="+btoa(JSON.stringify(styles["loaded"]));
+        ctheme = "&ctheme="+btoa(encodeURIComponent(JSON.stringify(styles["loaded"])));
     }
 
-    var encodedParam = url.split("?")[0]+"?"+encodeURIComponent(`uid=${unique_id}&msgd=${msg_dura}&hueai=${hue_auto_i}&mtord=${mtor_dir}&hueat=${hue_auto_t}&huer=${hue_rotate_s}&theme=${theme_sel.selectedIndex}&themets=${theme_t_s}&ares=${ares}&lcalc=${lcalc}&bl=${bl}&zv=${zv}&zt=${zt}&ov=${ov}&ot=${ot}&pw=${pw}&comp=${comp}${ctheme}`);
+    var encodedParam = url.split("?")[0]+"?"+encodeURIComponent(`uid=${unique_id}&msgd=${msg_dura}&hueai=${hue_auto_i}&mtord=${mtor_dir}&hueat=${hue_auto_t}&huer=${hue_rotate_s}&theme=${theme_sel.selectedIndex}&themets=${theme_t_s}&ares=${ares}&lcalc=${lcalc}&schmact=${sc_hmac_t}&sct=${sc_t}&bl=${bl}&zv=${zv}&zt=${zt}&ov=${ov}&ot=${ot}&pw=${pw}&comp=${comp}${ctheme}`);
     return encodedParam;
 }
 
@@ -194,6 +198,22 @@ function get_saved_data(){
             "elem": ge("lengthc_t"),
             "type": "toggle",
             "t_settingChanged": false,
+            "min": null,
+            "max": null
+        },
+        "schmact":{
+            "value_type": "bool",
+            "elem": ge("stegc_hmac_t"),
+            "type": "toggle",
+            "t_settingChanged": false,
+            "min": null,
+            "max": null
+        },
+        "sct":{
+            "value_type": "bool",
+            "elem": ge("stegc_t"),
+            "type": "toggle",
+            "t_settingChanged": true,
             "min": null,
             "max": null
         },
@@ -294,7 +314,7 @@ function load_data(elem,value,type,tsc,min,max,uique_id){
     else if (type == "toggle"){elem.checked = value;}
     else if (type == "var"){eval(elem + " = " + value);}
     else if (type == "customtheme"){
-        styles["loaded"] = JSON.parse(atob(value));
+        styles["loaded"] = JSON.parse(decodeURIComponent(atob(value)));
         changetheme("loaded");
     }
 
@@ -456,6 +476,16 @@ function settingChanged(elem){
         if (ge("shares_text").value != ""){ge("copy_shares").disabled = false;}
         calcLength(ge("shares_text"));
     }
+    else if (elem_id == "stegc_t"){
+        ge("charc_mode").style.display = (elem.checked) ? "None" : "";
+        ge("bl","geba").style.display = (elem.checked) ? "None" : "";
+        ge("zero","geba").style.display = (elem.checked) ? "None" : "";
+        ge("one","geba").style.display = (elem.checked) ? "None" : "";
+        ge("compr","geba").style.display = (elem.checked) ? "None" : "";
+        ge("stegc_hmac","geba").style.display = (elem.checked) ? "" : "None";
+        ge("steg_pwd_tip").style.display = (elem.checked) ? "" : "None";
+        switch_mode(null,null,3);
+    }
 }
 
 function ge(elem,mode="gebi"){
@@ -549,46 +579,66 @@ function encrypt(){
     const compression = ge('compr_t').checked;
     var input_var = ge('HideMsg_encr').value;
     if(compression){input_var = LZString.compress(input_var);}
-    if(password.length > 0){var hiddenmsg = XXTEA.encryptToBase64(input_var,btoa(password));}
+    if(password.length > 0){var hiddenmsg = XXTEA.encryptToBase64(input_var,btoa(encodeURIComponent(password)));}
     else{var hiddenmsg = input_var;}
     const output = ge('HiddenMsg_encr');
     const copybtn = ge('copy_encr');
+    const stegcloak_hmac = ge('stegc_hmac_t').checked;
+    const stegcloak_on = ge('stegc_t').checked;
+    const stegcloak = new StegCloak(true, false);
 
-    if(hiddenmsg.length == 0){
-        disable(output,copybtn);
-        showmsg("Info!","You havent set any hidden message");
-    }
-    else if(one == zero){
-        disable(output,copybtn);
-        showmsg("Info!","Zero and one cannot be the same unicode");
-    }
-    else if(zero_elem.value.length == 0){
-        disable(output,copybtn);
-        showmsg("Info!","Zero cannot be nothing");
-    }
-    else if(one_elem.value.length == 0){
-        disable(output,copybtn);
-        showmsg("Info!","One cannot be nothing");
-    }
-    else{
-        try{
-            var bin_encoded = text2Binary(bytelength,hiddenmsg);
-            var bin_hidden = bin_encoded[0].replaceAll("0",zero).replaceAll("1",one)
-            var bin_bl = bin_encoded[1].replaceAll("0",zero).replaceAll("1",one)
-            var i = decoymsg.indexOf(' ');
-            var decoy_splits = [decoymsg.slice(0,i), decoymsg.slice(i+1)];
-            copybtn.disabled = false;
-            if(decoymsg.length == 0 && bin_bl.length >= 1){output.value = bin_hidden+" "+bin_bl+decoy_splits[1];;}
-            else if(decoymsg.length == 0 && bin_bl.length <= 0){output.value = bin_hidden}
-            else if(decoymsg.split(" ").length > 1){output.value = decoy_splits[0]+bin_hidden+" "+bin_bl+decoy_splits[1];}
-            else {
-                disable(output,copybtn);
-                showmsg("Info!","Decoy msg has to be either empty or contain atleast one space");
-            }
+    if (stegcloak_on){
+        copybtn.disabled = false;
+        stegcloak.encrypt = (password.length == 0) ? false : true;
+        stegcloak.integrity = stegcloak_hmac;
+        if (decoymsg.length == 0){decoymsg = " ";}
+        else if (decoymsg.split(" ").length <= 1){
+            disable(output,copybtn);
+            showmsg("Info!","Decoy msg has to be either empty or contain atleast one space");
         }
+        try{output.value = stegcloak.hide(input_var,password,decoymsg);}
         catch (e){
             disable(output,copybtn);
             showmsg("Error","Hiding error, reason unknown",e,0);
+        }
+    }
+    else{
+        if(hiddenmsg.length == 0){
+            disable(output,copybtn);
+            showmsg("Info!","You havent set any hidden message");
+        }
+        else if(one == zero){
+            disable(output,copybtn);
+            showmsg("Info!","Zero and one cannot be the same unicode");
+        }
+        else if(zero_elem.value.length == 0){
+            disable(output,copybtn);
+            showmsg("Info!","Zero cannot be nothing");
+        }
+        else if(one_elem.value.length == 0){
+            disable(output,copybtn);
+            showmsg("Info!","One cannot be nothing");
+        }
+        else{
+            try{
+                var bin_encoded = text2Binary(bytelength,hiddenmsg);
+                var bin_hidden = bin_encoded[0].replaceAll("0",zero).replaceAll("1",one)
+                var bin_bl = bin_encoded[1].replaceAll("0",zero).replaceAll("1",one)
+                var i = decoymsg.indexOf(' ');
+                var decoy_splits = [decoymsg.slice(0,i), decoymsg.slice(i+1)];
+                copybtn.disabled = false;
+                if(decoymsg.length == 0 && bin_bl.length >= 1){output.value = bin_hidden+" "+bin_bl+decoy_splits[1];;}
+                else if(decoymsg.length == 0 && bin_bl.length <= 0){output.value = bin_hidden}
+                else if(decoymsg.split(" ").length > 1){output.value = decoy_splits[0]+bin_hidden+" "+bin_bl+decoy_splits[1];}
+                else {
+                    disable(output,copybtn);
+                    showmsg("Info!","Decoy msg has to be either empty or contain atleast one space");
+                }
+            }
+            catch (e){
+                disable(output,copybtn);
+                showmsg("Error","Hiding error, reason unknown",e,0);
+            }
         }
     }
     calcLength(output);
@@ -601,64 +651,82 @@ function decrypt(){
     const zero = (ge('zero_char_t').checked) ? zero_elem.value : String.fromCharCode(parseInt(zero_elem.value, 16));
     const one = (ge('one_char_t').checked) ? one_elem.value : String.fromCharCode(parseInt(one_elem.value, 16));
     const password = ge('pwd_var').value;
-    var hiddenmsg = ge('secretmsg_decr').value.split(" ")[0];
-    var saved_bl = ge('secretmsg_decr').value.split(" ")[1];
+    var fullmsg = ge('secretmsg_decr').value
+    var hiddenmsg = fullmsg.split(" ")[0];
+    var saved_bl = fullmsg.split(" ")[1];
     const compression = ge('compr_t').checked
     const output = ge('DHiddenMsg_decr');
     const copybtn = ge('copy_decr')
     copybtn.disabled = false;
+    const stegcloak_hmac = ge('stegc_hmac_t').checked;
+    const stegcloak_on = ge('stegc_t').checked;
+    const stegcloak = new StegCloak(true, false);
 
-    if(hiddenmsg.length == 0){
-        disable(output,copybtn);
-        showmsg("Info!","First field cannot be empty");
-    }
-    else if(one == zero){
-        disable(output,copybtn);
-        showmsg("Info!","Zero and one cannot be the same unicode");
-    }
-    else if(zero_elem.value.length == 0){
-        disable(output,copybtn);
-        showmsg("Info!","Zero cannot be nothing");
-    }
-    else if(one_elem.value.length == 0){
-        disable(output,copybtn);
-        showmsg("Info!","One cannot be nothing");
+    if (stegcloak_on){
+        stegcloak.encrypt = (password.length == 0) ? false : true;
+        if(fullmsg.length == 0){
+            disable(output,copybtn);
+            showmsg("Info!","First field cannot be empty");
+        }
+        try{output.value = stegcloak.reveal(fullmsg,password);}
+        catch (e){
+            disable(output,copybtn);
+            showmsg("Error","Hiding error, reason unknown",e,0);
+        }
     }
     else{
-        if(hiddenmsg.includes(zero) || hiddenmsg.includes(one)){
-            var regrem = new RegExp('[^'+zero+one+']', 'g');
-            hiddenmsg = hiddenmsg.replace(regrem,"");
-            hiddenmsg = hiddenmsg.replaceAll(zero,"0").replaceAll(one,"1");
-            if(saved_bl == null){
-                disable(output,copybtn);
-                showmsg("Info!","This Message Wasnt encrypted in Auto Mode, Byte Length Cannot be auto");
-            }
-            else{
-                saved_bl = saved_bl.replace(regrem,"");
-                saved_bl = saved_bl.replaceAll(zero,"0").replaceAll(one,"1");
-                if(saved_bl.length <= 0 && isNaN(bytelength)){
+        if(fullmsg.length == 0){
+            disable(output,copybtn);
+            showmsg("Info!","First field cannot be empty");
+        }
+        else if(one == zero){
+            disable(output,copybtn);
+            showmsg("Info!","Zero and one cannot be the same unicode");
+        }
+        else if(zero_elem.value.length == 0){
+            disable(output,copybtn);
+            showmsg("Info!","Zero cannot be nothing");
+        }
+        else if(one_elem.value.length == 0){
+            disable(output,copybtn);
+            showmsg("Info!","One cannot be nothing");
+        }
+        else{
+            if(hiddenmsg.includes(zero) || hiddenmsg.includes(one)){
+                var regrem = new RegExp('[^'+zero+one+']', 'g');
+                hiddenmsg = hiddenmsg.replace(regrem,"");
+                hiddenmsg = hiddenmsg.replaceAll(zero,"0").replaceAll(one,"1");
+                if(saved_bl == null){
                     disable(output,copybtn);
                     showmsg("Info!","This Message Wasnt encrypted in Auto Mode, Byte Length Cannot be auto");
                 }
                 else{
-                    var cont = true;
-                    if(isNaN(bytelength)){bytelength = parseInt(saved_bl, 2);}
-                    if(password.length > 0){
-                        try{var decrypted_text = XXTEA.decryptFromBase64(binary2Text(bytelength,hiddenmsg),btoa(password));}
-                        catch (e){
-                            disable(output,copybtn);
-                            cont = false;
-                            showmsg("Info!","The message you are trying to decrypt is not password locked or the password is incorrect","Or the byte length is incorrect");
-                        }
+                    saved_bl = saved_bl.replace(regrem,"");
+                    saved_bl = saved_bl.replaceAll(zero,"0").replaceAll(one,"1");
+                    if(saved_bl.length <= 0 && isNaN(bytelength)){
+                        disable(output,copybtn);
+                        showmsg("Info!","This Message Wasnt encrypted in Auto Mode, Byte Length Cannot be auto");
                     }
-                    else{var decrypted_text = binary2Text(bytelength,hiddenmsg);}
-                    if(cont){output.value = (compression) ? LZString.decompress(decrypted_text) : decrypted_text;}
+                    else{
+                        var cont = true;
+                        if(isNaN(bytelength)){bytelength = parseInt(saved_bl, 2);}
+                        if(password.length > 0){
+                            try{var decrypted_text = XXTEA.decryptFromBase64(binary2Text(bytelength,hiddenmsg),btoa(encodeURIComponent(password)));}
+                            catch (e){
+                                disable(output,copybtn);
+                                cont = false;
+                                showmsg("Info!","The message you are trying to decrypt is not password locked or the password is incorrect","Or the byte length is incorrect");
+                            }
+                        }
+                        else{var decrypted_text = binary2Text(bytelength,hiddenmsg);}
+                        if(cont){output.value = (compression) ? LZString.decompress(decrypted_text) : decrypted_text;}
+                    }
                 }
             }
-        }
-        else{
-            disable(output,copybtn);
-            showmsg("Info!","This Message Doesnt contain any hidden message","or characters you set for 0 and 1");
+            else{
+                disable(output,copybtn);
+                showmsg("Info!","This Message Doesnt contain any hidden message","or characters you set for 0 and 1");
+            }
         }
     }
     calcLength(output);
@@ -713,7 +781,7 @@ function showCharcodes(ignorewarning){
     }
 }
 
-function switch_mode(ind){
+function switch_mode(ind,oper=null,desel=null){
     const encbtn = ge('encr_mode');
     const decrbtn = ge('decr_mode');
     const lcharcbtn = ge('lcharc_mode');
@@ -726,47 +794,56 @@ function switch_mode(ind){
     const char = ge("charcodes","geba");
     const pinfo = ge("pageinfo","geba");
     const settingsm = ge("settingsp","geba");
-    if (typeof(ind) == "number"){
-        encbtn.classList = (ind == 0) ? "selected" : "";
-        decrbtn.classList = (ind == 1) ? "selected" : "";
-        lcharcbtn.classList = (ind == 2) ? "selected" : "";
-        charcbtn.classList = (ind == 3) ? "selected" : "";
-        pinfobtn.classList = (ind == 4) ? "selected" : "";
-        settingsmbtn.classList = (ind == 5) ? "selected" : "";
-        enc.style.display = (ind == 0) ? "inline-block" : "";
-        decr.style.display = (ind == 1) ? "inline-block" : "";
-        lchar.style.display = (ind == 2) ? "inline-block" : "";
-        char.style.display = (ind == 3) ? "inline-block" : "";
-        pinfo.style.display = (ind == 4) ? "inline-block" : "";
-        settingsm.style.display = (ind == 5) ? "inline-block" : "";
+
+    var all_btns = [encbtn,decrbtn,lcharcbtn,charcbtn,pinfobtn,settingsmbtn];
+    var sel_all = [];
+    var all_btns_length = all_btns.length;
+    for (var abi = 0; abi < all_btns_length; abi++) {sel_all.push(all_btns[abi].classList[0]);}
+    var sel_mode = sel_all.indexOf("selected");
+    var all_tabs = [enc,decr,lchar,char,pinfo,settingsm];
+    var all_tabs_length = all_tabs.length;
+
+    if (desel == sel_mode){oper = "-";}
+    if (oper == "+"){
+        sel_mode = (sel_mode + 1 <= all_tabs_length-1) ? sel_mode + 1 : 0;
+        ind = sel_mode;
     }
-    else{
-        var all_btns = [encbtn.classList[0],decrbtn.classList[0],lcharcbtn.classList[0],charcbtn.classList[0],pinfobtn.classList[0],settingsmbtn.classList[0]];
-        var sel_mode = all_btns.indexOf("selected");
-        var all_tabs = [enc,decr,lchar,char,pinfo,settingsm];
-        var all_tabs_length = all_tabs.length;
-        for (var ati = 0; ati < all_tabs_length; ati++) {
-            if (ind == "showall"){
+    else if (oper == "-"){
+        sel_mode = (sel_mode - 1 >= 0) ? sel_mode - 1 : all_tabs_length-1;
+        ind = sel_mode;
+    }
+
+    for (var ati = 0; ati < all_tabs_length; ati++) {
+        if (typeof(ind) == "number"){
+            if (ati == ind){
                 all_tabs[ati].style.display = "inline-block";
-                if (ati == sel_mode){
-                    all_tabs[ati].style.visibility = "visible";
-                }
-                else {
-                    all_tabs[ati].style.visibility = "hidden";
-                    all_tabs[ati].style.position = "absolute";
-                    all_tabs[ati].style.left = "-999em";
-                }
+                all_btns[ati].classList = "selected";
             }
-            else{
-                all_tabs[ati].style.visibility = "";
-                all_tabs[ati].style.position = "";
-                all_tabs[ati].style.left = "";
-                if (ati == sel_mode){
-                    all_tabs[ati].style.display = "inline-block";
-                }
-                else {
-                    all_tabs[ati].style.display = "";
-                }
+            else {
+                all_tabs[ati].style.display = "";
+                all_btns[ati].classList = "";
+            }
+        }
+        else if (ind == "showall"){
+            all_tabs[ati].style.display = "inline-block";
+            if (ati == sel_mode){
+                all_tabs[ati].style.visibility = "visible";
+            }
+            else {
+                all_tabs[ati].style.visibility = "hidden";
+                all_tabs[ati].style.position = "absolute";
+                all_tabs[ati].style.left = "-999em";
+            }
+        }
+        else if (ind == "restore"){
+            all_tabs[ati].style.visibility = "";
+            all_tabs[ati].style.position = "";
+            all_tabs[ati].style.left = "";
+            if (ati == sel_mode){
+                all_tabs[ati].style.display = "inline-block";
+            }
+            else {
+                all_tabs[ati].style.display = "";
             }
         }
     }

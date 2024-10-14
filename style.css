@@ -561,7 +561,7 @@ Main
 .main {
     text-align: center;
 }
-.control-panel > div:nth-of-type(-n+5) {
+.control-panel > div:nth-of-type(-n+7) {
     background-color: var(--secondary-color);
     display: inline-block;
     padding-left: 10px;

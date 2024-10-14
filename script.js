@@ -575,7 +575,7 @@ function encrypt(){
     const zero = (ge('zero_char_t').checked) ? zero_elem.value : String.fromCharCode(parseInt(zero_elem.value, 16));
     const one = (ge('one_char_t').checked) ? one_elem.value : String.fromCharCode(parseInt(one_elem.value, 16));
     const password = ge('pwd_var').value;
-    const decoymsg = ge('DecoyMsg_encr').value;
+    var decoymsg = ge('DecoyMsg_encr').value;
     const compression = ge('compr_t').checked;
     var input_var = ge('HideMsg_encr').value;
     if(compression){input_var = LZString.compress(input_var);}
@@ -591,15 +591,17 @@ function encrypt(){
         copybtn.disabled = false;
         stegcloak.encrypt = (password.length == 0) ? false : true;
         stegcloak.integrity = stegcloak_hmac;
-        if (decoymsg.length == 0){decoymsg = " ";}
-        else if (decoymsg.split(" ").length <= 1){
+        if (decoymsg.length == 0){decoymsg = "  ";}
+        if (decoymsg.split(" ").length <= 1){
             disable(output,copybtn);
             showmsg("Info!","Decoy msg has to be either empty or contain atleast one space");
         }
-        try{output.value = stegcloak.hide(input_var,password,decoymsg);}
-        catch (e){
-            disable(output,copybtn);
-            showmsg("Error","Hiding error, reason unknown",e,0);
+        else{
+            try{output.value = stegcloak.hide(input_var,password,decoymsg);}
+            catch (e){
+                disable(output,copybtn);
+                showmsg("Error","Hiding error, reason unknown",e,0);
+            }
         }
     }
     else{
@@ -671,7 +673,8 @@ function decrypt(){
         try{output.value = stegcloak.reveal(fullmsg,password);}
         catch (e){
             disable(output,copybtn);
-            showmsg("Error","Hiding error, reason unknown",e,0);
+            if (e instanceof TypeError) {showmsg("Error","Revealing error","Its possible you are trying to decrypt mmessage that wasnt made in stegcloak with stegcloak");}
+            else {showmsg("Error","Revealing error, reason unknown",e,0);}
         }
     }
     else{

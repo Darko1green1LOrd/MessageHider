@@ -81,53 +81,26 @@ function runonload(){
     if (ge("shares_text").value != ""){ge("copy_shares").disabled = false;}
 }
 
-function save_data_in_url(url=document.URL){
-    const msg_dura = ge("msgdura_v").value;
-    const hue_auto_i = ge("huer_vi").value;
-    const mtor_dir = moveto_right;
-    const hue_auto_t = ge("huer_t").checked;
-    const hue_rotate_s = ge("huer_s").value;
-    const theme_sel = ge("stylesel-db");
-    const theme_t_s = ge("stylesel_t").checked;
-    const unique_id = genstr(10);
-    const ares = ge("autores_t").checked;
-    const lcalc = ge("lengthc_t").checked;
-    const sc_hmac_t = ge("stegc_hmac_t").checked;
-    const sc_t = ge("stegc_t").checked;
-    const bl = encodeURIComponent(XXTEA.encryptToBase64(ge("byte_length").value,unique_id));
-    const zv = encodeURIComponent(XXTEA.encryptToBase64(ge("zero_var").value,unique_id));
-    const zt = ge("zero_char_t").checked;
-    const ov = encodeURIComponent(XXTEA.encryptToBase64(ge("one_var").value,unique_id));
-    const ot = ge("one_char_t").checked;
-    const pw = encodeURIComponent(XXTEA.encryptToBase64(ge("pwd_var").value,unique_id));
-    const comp = ge("compr_t").checked;
-
-    var ctheme = "";
-    if (theme_sel.options[theme_sel.selectedIndex].value == "c"){
-        styles["loaded"] = {};
-
-        var all_stylevars = ge("stylesel_table").children[0].children;
-        var all_stylevars_length = all_stylevars.length;
-        for (var asv = 1; asv < all_stylevars_length; asv++) {
-            elem = all_stylevars[asv].children[1].children[0];
-            styles["loaded"][elem.dataset.varid] = elem.value;
-        }
-        ctheme = "&ctheme="+btoa(encodeURIComponent(JSON.stringify(styles["loaded"])));
-    }
-
-    var encodedParam = url.split("?")[0]+"?"+encodeURIComponent(`uid=${unique_id}&msgd=${msg_dura}&hueai=${hue_auto_i}&mtord=${mtor_dir}&hueat=${hue_auto_t}&huer=${hue_rotate_s}&theme=${theme_sel.selectedIndex}&themets=${theme_t_s}&ares=${ares}&lcalc=${lcalc}&schmact=${sc_hmac_t}&sct=${sc_t}&bl=${bl}&zv=${zv}&zt=${zt}&ov=${ov}&ot=${ot}&pw=${pw}&comp=${comp}${ctheme}`);
-    return encodedParam;
-}
-
-function get_saved_data(){
-    var data = {
+var save_data;
+function setup_savedata(){
+    save_data = {
+        "uid":{
+            "value_type": "str",
+            "elem": genstr(10),
+            "type": "checkvar",
+            "t_settingChanged": false,
+            "min": null,
+            "max": null,
+            "default": null
+        },
         "msgd":{
             "value_type": "num",
             "elem": ge("msgdura_v"),
             "type": "inputbox",
             "t_settingChanged": true,
             "min": ge("msgdura_v").min,
-            "max": ge("msgdura_v").max
+            "max": ge("msgdura_v").max,
+            "default": ge("msgdura_v").dataset.defvalue
         },
         "hueai":{
             "value_type": "num",
@@ -135,7 +108,8 @@ function get_saved_data(){
             "type": "inputbox",
             "t_settingChanged": true,
             "min": ge("huer_vi").min,
-            "max": ge("huer_vi").max
+            "max": ge("huer_vi").max,
+            "default": ge("huer_vi").dataset.defvalue
         },
         "mtord":{
             "value_type": "bool",
@@ -143,7 +117,8 @@ function get_saved_data(){
             "type": "var",
             "t_settingChanged": false,
             "min": null,
-            "max": null
+            "max": null,
+            "default": "true"
         },
         "hueat":{
             "value_type": "bool",
@@ -151,7 +126,8 @@ function get_saved_data(){
             "type": "toggle",
             "t_settingChanged": true,
             "min": null,
-            "max": null
+            "max": null,
+            "default": ge("huer_t").dataset.defvalue
         },
         "huer":{
             "value_type": "num",
@@ -159,7 +135,8 @@ function get_saved_data(){
             "type": "slider",
             "t_settingChanged": true,
             "min": ge("huer_s").min,
-            "max": ge("huer_s").max
+            "max": ge("huer_s").max,
+            "default": ge("huer_s").dataset.defvalue
         },
         "theme":{
             "value_type": "num",
@@ -167,7 +144,8 @@ function get_saved_data(){
             "type": "dropdown",
             "t_settingChanged": true,
             "min": 0,
-            "max": ge("stylesel-db").childElementCount-1
+            "max": ge("stylesel-db").childElementCount-1,
+            "default": ge("stylesel-db").dataset.defvalue
         },
         "themets":{
             "value_type": "bool",
@@ -175,15 +153,8 @@ function get_saved_data(){
             "type": "toggle",
             "t_settingChanged": true,
             "min": null,
-            "max": null
-        },
-        "ctheme":{
-            "value_type": "str",
-            "elem": ge("stylesel-db"),
-            "type": "customtheme",
-            "t_settingChanged": true,
-            "min": null,
-            "max": null
+            "max": null,
+            "default": ge("stylesel_t").dataset.defvalue
         },
         "ares":{
             "value_type": "bool",
@@ -191,7 +162,8 @@ function get_saved_data(){
             "type": "toggle",
             "t_settingChanged": false,
             "min": null,
-            "max": null
+            "max": null,
+            "default": ge("autores_t").dataset.defvalue
         },
         "lcalc":{
             "value_type": "bool",
@@ -199,7 +171,8 @@ function get_saved_data(){
             "type": "toggle",
             "t_settingChanged": false,
             "min": null,
-            "max": null
+            "max": null,
+            "default": ge("lengthc_t").dataset.defvalue
         },
         "schmact":{
             "value_type": "bool",
@@ -207,7 +180,8 @@ function get_saved_data(){
             "type": "toggle",
             "t_settingChanged": false,
             "min": null,
-            "max": null
+            "max": null,
+            "default": ge("stegc_hmac_t").dataset.defvalue
         },
         "sct":{
             "value_type": "bool",
@@ -215,7 +189,8 @@ function get_saved_data(){
             "type": "toggle",
             "t_settingChanged": true,
             "min": null,
-            "max": null
+            "max": null,
+            "default": ge("stegc_t").dataset.defvalue
         },
         "bl":{
             "value_type": "str",
@@ -223,7 +198,8 @@ function get_saved_data(){
             "type": "pwinputbox",
             "t_settingChanged": false,
             "min": null,
-            "max": null
+            "max": null,
+            "default": ge("byte_length").dataset.defvalue
         },
         "zv":{
             "value_type": "str",
@@ -231,7 +207,8 @@ function get_saved_data(){
             "type": "pwinputbox",
             "t_settingChanged": false,
             "min": null,
-            "max": null
+            "max": null,
+            "default": ge("zero_var").dataset.defvalue
         },
         "zt":{
             "value_type": "bool",
@@ -239,7 +216,8 @@ function get_saved_data(){
             "type": "toggle",
             "t_settingChanged": false,
             "min": null,
-            "max": null
+            "max": null,
+            "default": ge("zero_char_t").dataset.defvalue
         },
         "ov":{
             "value_type": "str",
@@ -247,7 +225,8 @@ function get_saved_data(){
             "type": "pwinputbox",
             "t_settingChanged": false,
             "min": null,
-            "max": null
+            "max": null,
+            "default": ge("one_var").dataset.defvalue
         },
         "ot":{
             "value_type": "bool",
@@ -255,7 +234,8 @@ function get_saved_data(){
             "type": "toggle",
             "t_settingChanged": false,
             "min": null,
-            "max": null
+            "max": null,
+            "default": ge("one_char_t").dataset.defvalue
         },
         "pw":{
             "value_type": "str",
@@ -263,7 +243,8 @@ function get_saved_data(){
             "type": "pwinputbox",
             "t_settingChanged": false,
             "min": null,
-            "max": null
+            "max": null,
+            "default": ge("pwd_var").dataset.defvalue
         },
         "comp":{
             "value_type": "bool",
@@ -271,10 +252,85 @@ function get_saved_data(){
             "type": "toggle",
             "t_settingChanged": false,
             "min": null,
-            "max": null
+            "max": null,
+            "default": ge("compr_t").dataset.defvalue
+        },
+        "ctheme":{
+            "value_type": "str",
+            "elem": ge("stylesel_t"),
+            "type": "customtheme",
+            "t_settingChanged": true,
+            "min": null,
+            "max": null,
+            "default": null
         }
     }
+}
 
+function save_data_in_url(url=document.URL){
+    setup_savedata();
+    var data_to_save = "";
+
+    var data_keys = Object.keys(save_data);
+    for (i = 0; i < data_keys.length; i++) {
+        var curr_item = save_data[data_keys[i]];
+        var to_add = "";
+
+        if (curr_item["type"] == "checkvar" && (curr_item["elem"] != curr_item["default"] || curr_item["default"] == null)){to_add += data_keys[i]+"="+curr_item["elem"];}
+        else if ((curr_item["type"] == "inputbox" || curr_item["type"] == "slider") && (curr_item["elem"].value != curr_item["default"] || curr_item["default"] == null)){
+            to_add += data_keys[i]+"="+curr_item["elem"].value;
+            if (curr_item["value_type"] == "num"){
+                if (curr_item["min"] != null){to_add = (curr_item["elem"].value >= Number(curr_item["min"])) ? to_add : "";}
+                if (curr_item["max"] != null){to_add = (curr_item["elem"].value <= Number(curr_item["max"])) ? to_add : "";}
+            }
+        }
+        else if (curr_item["type"] == "var" && (eval(curr_item["elem"]) != curr_item["default"] || curr_item["default"] == null)){
+            to_add += data_keys[i]+"="+eval(curr_item["elem"]);
+            if (curr_item["value_type"] == "bool" && (eval(curr_item["elem"]) == (curr_item["default"] === 'true'))){
+                to_add = "";
+            }
+        }
+        else if (curr_item["type"] == "toggle" && (curr_item["elem"].checked != (curr_item["default"] === 'true') || curr_item["default"] == null)){
+            to_add += data_keys[i]+"="+curr_item["elem"].checked;
+        }
+        else if (curr_item["type"] == "dropdown" && (curr_item["elem"].selectedIndex != curr_item["default"] || curr_item["default"] == null)){
+            to_add += data_keys[i]+"="+curr_item["elem"].selectedIndex;
+            if (curr_item["value_type"] == "num"){
+                if (curr_item["min"] != null){to_add = (curr_item["elem"].selectedIndex >= Number(curr_item["min"])) ? to_add : "";}
+                if (curr_item["max"] != null){to_add = (curr_item["elem"].selectedIndex <= Number(curr_item["max"])) ? to_add : "";}
+            }
+        }
+        else if (curr_item["type"] == "pwinputbox" && (curr_item["elem"].value != curr_item["default"] || curr_item["default"] == null)){
+            to_add += data_keys[i]+"="+encodeURIComponent(XXTEA.encryptToBase64(curr_item["elem"].value,save_data["uid"]["elem"]));
+        }
+        else if (curr_item["type"] == "customtheme"){
+            var theme_sel = save_data["theme"]["elem"];
+            var ctheme = "";
+            if (theme_sel.options[theme_sel.selectedIndex].value == "c"){
+                styles["loaded"] = {};
+
+                var all_stylevars = ge("stylesel_table").children[0].children;
+                var all_stylevars_length = all_stylevars.length;
+                for (var asv = 1; asv < all_stylevars_length; asv++) {
+                    var elem = all_stylevars[asv].children[1].children[0];
+                    if (elem.value != elem.dataset.defvalue){
+                        styles["loaded"][elem.dataset.varid] = elem.value;
+                    }
+                }
+            if (Object.keys(styles["loaded"]).length > 0){to_add += "ctheme="+btoa(encodeURIComponent(JSON.stringify(styles["loaded"])));}
+            }
+        }
+
+        if (data_to_save.length >= 1 && to_add.length >= 1){to_add = "&"+to_add;}
+        data_to_save += to_add;
+    }
+
+    var encodedParam = url.split("?")[0]+"?"+encodeURIComponent(data_to_save);
+    return (Object.keys(parseURLParams(decodeURIComponent(encodedParam))).length >= 2) ? encodedParam : url.split("?")[0];
+}
+
+function get_saved_data(){
+    setup_savedata();
     const unique_id = ge("uid_storage");
 
     var url = document.URL;
@@ -283,17 +339,17 @@ function get_saved_data(){
         if(unique_id.value != params["uid"][0]){
             var params_keys = Object.keys(params);
             for (i = 0; i < params_keys.length; i++) {
-                if (Object.keys(data).indexOf(params_keys[i]) != -1){
-                    var data_sel = data[params_keys[i]];
+                if (Object.keys(save_data).indexOf(params_keys[i]) != -1){
+                    var data_sel = save_data[params_keys[i]];
                     var params_obtained = params[params_keys[i]]
                     if (data_sel["value_type"] == "num" && !isNaN(Number(params_obtained[0]))){
-                        load_data(data_sel["elem"],Number(params_obtained[0]),data_sel["type"],data_sel["t_settingChanged"],data_sel["min"],data_sel["max"],params["uid"][0]);
+                        load_data(data_sel["elem"],Number(params_obtained[0]),data_sel["type"],data_sel["t_settingChanged"],data_sel["min"],data_sel["max"],params["uid"][0],data_sel["default"]);
                     }
                     else if (data_sel["value_type"] == "bool" && (params_obtained[0] === 'true' || params_obtained[0] === 'false')){
-                        load_data(data_sel["elem"],params_obtained[0] === 'true',data_sel["type"],data_sel["t_settingChanged"],data_sel["min"],data_sel["max"],params["uid"][0]);
+                        load_data(data_sel["elem"],params_obtained[0] === 'true',data_sel["type"],data_sel["t_settingChanged"],data_sel["min"],data_sel["max"],params["uid"][0],data_sel["default"]);
                     }
                     else if (data_sel["value_type"] == "str" && params_obtained[0] != ""){
-                        load_data(data_sel["elem"],params_obtained[0],data_sel["type"],data_sel["t_settingChanged"],data_sel["min"],data_sel["max"],params["uid"][0]);
+                        load_data(data_sel["elem"],params_obtained[0],data_sel["type"],data_sel["t_settingChanged"],data_sel["min"],data_sel["max"],params["uid"][0],data_sel["default"]);
                     }
                 }
             }
@@ -302,9 +358,15 @@ function get_saved_data(){
     }
 }
 
-function load_data(elem,value,type,tsc,min,max,uique_id){
-    if (min != null){value = (value >= Number(min)) ? value : Number(min);}
-    if (max != null){value = (value <= Number(max)) ? value : Number(max);}
+function load_data(elem,value,type,tsc,min,max,uique_id,defaultvar){
+    if (min != null){
+        var varto_replace = (defaultvar != null) ? defaultvar : min;
+        value = (value >= Number(min)) ? value : Number(varto_replace);
+    }
+    if (max != null){
+        var varto_replace = (defaultvar != null) ? defaultvar : max;
+        value = (value <= Number(max)) ? value : Number(varto_replace);
+    }
 
     if (type == "dropdown"){dropdown_change(elem,value);}
     else if (type == "inputbox"){elem.value = value;}
@@ -535,7 +597,7 @@ function copytext(elemid) { //https://stackoverflow.com/questions/28001722/how-t
 
 window.addEventListener("unhandledrejection", function(promiseRejectionEvent) {
     showmsg("Oops","Failed to copy the text automatically","you will have to copy it manually");
-}); 
+});
 
 function disable(textfield,button){
     textfield.value = "";

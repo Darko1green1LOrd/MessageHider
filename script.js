@@ -303,6 +303,13 @@ function save_data_in_url(url=document.URL){
         else if (curr_item["type"] == "pwinputbox" && (curr_item["elem"].value != curr_item["default"] || curr_item["default"] == null)){
             to_add += data_keys[i]+"="+encodeURIComponent(XXTEA.encryptToBase64(curr_item["elem"].value,save_data["uid"]["elem"]));
         }
+        else if (curr_item["type"] == "htmlvar" && (curr_item["elem"].innerHTML != curr_item["default"] || curr_item["default"] == null)){
+            to_add += data_keys[i]+"="+curr_item["elem"].innerHTML;
+            if (curr_item["value_type"] == "num"){
+                if (curr_item["min"] != null){to_add = (curr_item["elem"].innerHTML >= Number(curr_item["min"])) ? to_add : "";}
+                if (curr_item["max"] != null){to_add = (curr_item["elem"].innerHTML <= Number(curr_item["max"])) ? to_add : "";}
+            }
+        }
         else if (curr_item["type"] == "customtheme"){
             var theme_sel = save_data["theme"]["elem"];
             var ctheme = "";

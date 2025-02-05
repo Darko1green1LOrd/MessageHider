@@ -150,6 +150,7 @@ button.selected:enabled {
 button[disabled] {
     background-color: var(--disabled-main);
     color: var(--bg-color);
+    cursor: default;
 }
 
 .switch input {

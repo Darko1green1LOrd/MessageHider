@@ -647,14 +647,14 @@ function encrypt(){
     var decoymsg = ge('DecoyMsg_encr').value;
     const compression = ge('compr_t').checked;
     var input_var = ge('HideMsg_encr').value;
-    if(compression){input_var = LZString.compress(input_var);}
+    const stegcloak_hmac = ge('stegc_hmac_t').checked;
+    const stegcloak_on = ge('stegc_t').checked;
+    const stegcloak = new StegCloak(true, false);
+    if(compression && !stegcloak_on){input_var = LZString.compress(input_var);}
     if(password.length > 0){var hiddenmsg = XXTEA.encryptToBase64(input_var,btoa(encodeURIComponent(password)));}
     else{var hiddenmsg = input_var;}
     const output = ge('HiddenMsg_encr');
     const copybtn = ge('copy_encr');
-    const stegcloak_hmac = ge('stegc_hmac_t').checked;
-    const stegcloak_on = ge('stegc_t').checked;
-    const stegcloak = new StegCloak(true, false);
 
     if (stegcloak_on){
         copybtn.disabled = false;

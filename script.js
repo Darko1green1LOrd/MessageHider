@@ -920,3 +920,7 @@ function switch_mode(ind,oper=null,desel=null){
         }
     }
 }
+
+function vist_page(link){
+    window.location.href = link;
+}

@@ -98,7 +98,7 @@ input, textarea {
     color: var(--text-color);
 }
 
-textarea[readonly] {
+textarea[readonly], input[readonly] {
     background-color: var(--fourth-color);
 }
 
